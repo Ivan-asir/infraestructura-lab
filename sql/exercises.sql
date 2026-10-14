@@ -4,7 +4,7 @@ FROM clientes c
 JOIN pedidos p ON p.cliente_id = c.id
 JOIN pedido_items i ON i.pedido_id = p.id
 GROUP BY c.id, c.nombre
-ORDER BY total DESC;
+ORDER BY total DESC, c.id;
 
 -- Clientes sin pedidos
 SELECT c.id, c.nombre

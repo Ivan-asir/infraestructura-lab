@@ -26,3 +26,36 @@ $ getent hosts download.rockylinux.org
 
 $ ssh labadmin@192.168.56.20 hostname
 pg-primary
+$ ip route show default
+default via 10.0.2.2 dev enp0s3 proto dhcp src 10.0.2.15 metric 100 
+
+$ ip -6 route show default
+default via fe80::2 dev enp0s3 proto ra metric 100 pref medium
+
+$ ip -4 route get 1.1.1.1
+1.1.1.1 via 10.0.2.2 dev enp0s3 src 10.0.2.15 uid 1000 
+    cache 
+
+$ curl -4 -I --connect-timeout 5 --max-time 10 https://rockylinux.org
+  % Total    % Received % Xferd  Average Speed   Time    Time     Time  Current
+                                 Dload  Upload   Total   Spent    Left  Speed
+  0     0    0     0    0     0      0      0 --:--:-- --:--:-- --:--:--     0  0  334k    0     0    0     0      0      0 --:--:-- --:--:-- --:--:--     0
+HTTP/2 200 
+age: 1126
+cache-control: public, max-age=0, must-revalidate
+content-type: text/html; charset=utf-8
+date: Wed, 14 Oct 2026 11:43:06 GMT
+etag: "ljenc1zuqt7c0j"
+link: <https://rockylinux.org/af-ZA>; rel="alternate"; hreflang="af-ZA", <https://rockylinux.org/ar-SA>; rel="alternate"; hreflang="ar-SA", <https://rockylinux.org/ca-ES>; rel="alternate"; hreflang="ca-ES", <https://rockylinux.org/cs-CZ>; rel="alternate"; hreflang="cs-CZ", <https://rockylinux.org/da-DK>; rel="alternate"; hreflang="da-DK", <https://rockylinux.org/de-DE>; rel="alternate"; hreflang="de-DE", <https://rockylinux.org/el-GR>; rel="alternate"; hreflang="el-GR", <https://rockylinux.org/>; rel="alternate"; hreflang="en", <https://rockylinux.org/es-ES>; rel="alternate"; hreflang="es-ES", <https://rockylinux.org/fa-IR>; rel="alternate"; hreflang="fa-IR", <https://rockylinux.org/fi-FI>; rel="alternate"; hreflang="fi-FI", <https://rockylinux.org/fr-FR>; rel="alternate"; hreflang="fr-FR", <https://rockylinux.org/he-IL>; rel="alternate"; hreflang="he-IL", <https://rockylinux.org/hi-IN>; rel="alternate"; hreflang="hi-IN", <https://rockylinux.org/hu-HU>; rel="alternate"; hreflang="hu-HU", <https://rockylinux.org/id-ID>; rel="alternate"; hreflang="id-ID", <https://rockylinux.org/it-IT>; rel="alternate"; hreflang="it-IT", <https://rockylinux.org/ja-JP>; rel="alternate"; hreflang="ja-JP", <https://rockylinux.org/ka-GE>; rel="alternate"; hreflang="ka-GE", <https://rockylinux.org/ko-KR>; rel="alternate"; hreflang="ko-KR", <https://rockylinux.org/nl-NL>; rel="alternate"; hreflang="nl-NL", <https://rockylinux.org/no-NO>; rel="alternate"; hreflang="no-NO", <https://rockylinux.org/pl-PL>; rel="alternate"; hreflang="pl-PL", <https://rockylinux.org/pt-BR>; rel="alternate"; hreflang="pt-BR", <https://rockylinux.org/pt-PT>; rel="alternate"; hreflang="pt-PT", <https://rockylinux.org/ro-RO>; rel="alternate"; hreflang="ro-RO", <https://rockylinux.org/ru-RU>; rel="alternate"; hreflang="ru-RU", <https://rockylinux.org/sr-SP>; rel="alternate"; hreflang="sr-SP", <https://rockylinux.org/sv-SE>; rel="alternate"; hreflang="sv-SE", <https://rockylinux.org/ta-IN>; rel="alternate"; hreflang="ta-IN", <https://rockylinux.org/tr-TR>; rel="alternate"; hreflang="tr-TR", <https://rockylinux.org/uk-UA>; rel="alternate"; hreflang="uk-UA", <https://rockylinux.org/vi-VN>; rel="alternate"; hreflang="vi-VN", <https://rockylinux.org/zh-CN>; rel="alternate"; hreflang="zh-CN", <https://rockylinux.org/zh-TW>; rel="alternate"; hreflang="zh-TW", <https://rockylinux.org/>; rel="alternate"; hreflang="x-default"
+server: Vercel
+set-cookie: NEXT_LOCALE=en; Path=/; SameSite=lax
+strict-transport-security: max-age=63072000
+vary: rsc, next-router-state-tree, next-router-prefetch, next-router-segment-prefetch
+x-matched-path: /en
+x-nextjs-prerender: 1
+x-nextjs-stale-time: 300
+x-powered-by: Next.js
+x-vercel-cache: HIT
+x-vercel-id: cdg1::iad1::9g48r-1791979314061-ec1f7e6f978a
+content-length: 342185
+

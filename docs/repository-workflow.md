@@ -13,12 +13,14 @@
 
 ## Validación común
 
-El script `scripts/validate-repository.sh` comprueba formato Git, nombres de
-ficheros sensibles, posibles secretos, sintaxis Bash y, cuando las herramientas
-están instaladas, validaciones de ShellCheck y Ansible.
+El script `scripts/validate-repository.sh` comprueba que se ejecuta dentro de
+un repositorio Git, revisa los cambios con `git diff --check` y
+`git diff --cached --check`, detecta algunos nombres de archivos sensibles
+entre los versionados y valida los scripts de `scripts/` con `bash -n`.
 
-Una advertencia del script requiere revisión manual. Un error debe resolverse
-antes del commit o del push.
+No analiza el contenido para detectar secretos ni ejecuta ShellCheck,
+`ansible-playbook` o `ansible-lint`. Esas comprobaciones, cuando se utilicen,
+deben ejecutarse por separado.
 
 ## Política de publicación
 

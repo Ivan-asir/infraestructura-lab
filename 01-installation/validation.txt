@@ -1,3 +1,5 @@
+=== Estado inicial de PostgreSQL ===
+
 $ sudo -u postgres pg_isready
 /var/run/postgresql:5432 - aceptando conexiones
 
@@ -12,3 +14,14 @@ active
 
 $ sudo -u postgres psql -Atc "SHOW listen_addresses;"
 localhost
+
+=== Objetos iniciales de PostgreSQL ===
+
+$ Comprobación del rol app_user
+app_user|t
+
+$ Comprobación de appdb
+appdb|app_user
+
+$ Comprobación del esquema app
+app|app_user

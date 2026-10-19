@@ -15,15 +15,12 @@ El objetivo es relacionar administración DBA, sistemas Linux,
 automatización, contenedores y prácticas DevOps mediante
 ejercicios reproducibles y evidencias técnicas.
 
-## Entorno empleado
+## Entorno de trabajo
 
 - VirtualBox
 - Rocky Linux 9
 - PostgreSQL
 - Ansible Core
-
-## Tecnologías previstas para ampliación
-
 - Docker y Docker Compose.
 - WSL2.
 - GitHub Actions.

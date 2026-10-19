@@ -28,7 +28,7 @@ JOIN pedido_items pi ON p.id = pi.pedido_id
 GROUP BY mes, anio
 ORDER BY anio, mes;
 
--- Ranking de clientes (con CTE)
+-- Facturación por cliente (con CTE)
 
 WITH facturacion_por_pedido AS (
 	SELECT pi.pedido_id, SUM(pi.cantidad * pi.precio_unitario) AS total
@@ -41,7 +41,7 @@ JOIN facturacion_por_pedido fpp ON fpp.pedido_id = p.id
 GROUP BY p.cliente_id
 ORDER BY facturacion_total_cliente DESC;
 
--- Ranking de clientes (sin CTE)
+-- Facturación por cliente (sin CTE)
 
 SELECT p.cliente_id, SUM(pi.cantidad * pi.precio_unitario) AS facturacion_total_cliente
 FROM pedidos p

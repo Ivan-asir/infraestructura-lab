@@ -22,3 +22,7 @@ id_ed25519*
 .DS_Store
 .idea/
 .vscode/
+
+# Claves privadas del laboratorio
+*.ppk
+pg_lab_ed25519*

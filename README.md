@@ -8,12 +8,30 @@ Instalación y administración de PostgreSQL, SQL, roles y permisos,
 backup y restore, PITR, rendimiento, monitorización, troubleshooting,
 replicación física y automatización con Ansible.
 
+El laboratorio se amplía progresivamente hacia Docker,
+GitHub Actions, Oracle Database Free y Kubernetes.
+
+El objetivo es relacionar administración DBA, sistemas Linux,
+automatización, contenedores y prácticas DevOps mediante
+ejercicios reproducibles y evidencias técnicas.
+
 ## Entorno empleado
 
 - VirtualBox
 - Rocky Linux 9
 - PostgreSQL
 - Ansible Core
+
+## Tecnologías previstas para ampliación
+
+- Docker y Docker Compose.
+- WSL2.
+- GitHub Actions.
+- Oracle Database Free.
+- Kubernetes con kind.
+
+Estas tecnologías se incorporarán progresivamente.
+Su inclusión en el alcance no implica que estén instaladas.
 
 ## Estado
 
@@ -29,6 +47,9 @@ replicación física y automatización con Ansible.
 | Monitorización y troubleshooting | Pendiente |
 | Replicación | Pendiente |
 | Ansible | Pendiente |
+| Docker Compose y CI | Pendiente |
+| Oracle Database Free | Pendiente |
+| Kubernetes | Pendiente |
 
 ## Alcance
 

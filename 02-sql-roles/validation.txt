@@ -1,14 +1,33 @@
-$ recuentos de tablas
-clientes=20
+=== 1) Recuentos de tablas ===
+
+clientes=24
 productos=100
 pedidos=200
 pedido_items=200
 
-$ roles del laboratorio
-tienda_readonly|login=false
-tienda_readwrite|login=false
 
-$ privilegios de tablas
+=== 2) Clientes sin pedidos ===
+
+ id |   nombre
+----+------------
+ 21 | Cliente 21
+ 22 | Cliente 22
+ 23 | Cliente 23
+ 24 | Cliente 24
+(4 filas)
+
+
+=== 3) Roles del laboratorio ===
+
+     rolname      | rolcanlogin
+------------------+-------------
+ tienda_readonly  | f
+ tienda_readwrite | f
+(2 filas)
+
+
+=== 4) Privilegios ===
+
                                                       Privilegios
  Esquema |      Nombre      |   Tipo    |          Privilegios           | Privilegios de acceso a columnas | Políticas
 ---------+------------------+-----------+--------------------------------+----------------------------------+-----------
@@ -33,14 +52,39 @@ $ privilegios de tablas
 (7 filas)
 
 
-$ lectura como tienda_readonly
+=== 5) Lectura como tienda_readonly ===
+
 SET
  count
 -------
-    20
+    24
 (1 fila)
 
 
-$ escritura denegada como tienda_readonly
+=== 6) Escritura denegada a tienda_readonly ===
+
+BEGIN
 SET
 ERROR:  permiso denegado a la tabla productos
+OK: escritura denegada por permisos.
+
+
+=== 7) Inserción con tienda_readwrite y ROLLBACK ===
+
+BEGIN
+SET
+INSERT 0 1
+ROLLBACK
+
+
+=== 8) Verificación final ===
+
+ total_productos
+-----------------
+             100
+(1 fila)
+
+ productos_de_prueba
+---------------------
+                   0
+(1 fila)

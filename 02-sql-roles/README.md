@@ -2,15 +2,16 @@
 
 ## Objetivo
 
-Practicar DDL, carga de datos sintéticos, consultas SQL y permisos mínimos
+Trabajar DDL, carga de datos, consultas SQL y permisos mínimos
 sobre la base `tienda`.
 
 ## Ficheros SQL
 
 - `../sql/schema.sql`: tablas, claves y restricciones.
-- `../sql/seed.sql`: datos sintéticos reproducibles.
-- `../sql/exercises.sql`: consultas de práctica.
-- `roles.sql`: roles de grupo y privilegios.
+- `../sql/seed.sql`: carga reproducible de datos.
+- `../sql/exercises.md`: enunciados y criterios.
+- `../sql/exercises.sql`: soluciones SQL.
+- `roles.sql`: definición de roles y permisos.
 
 ## Roles
 
@@ -26,10 +27,57 @@ tablas existentes y usar las secuencias necesarias para inserciones.
 
 ## Seguridad
 
-Los roles de este ejercicio son `NOLOGIN`; por tanto no contienen
-contraseñas. No se versionan credenciales ni datos reales.
+Los roles son `NOLOGIN`; por tanto no contienen contraseñas.
+No se versionan credenciales ni datos reales.
+
+## Enunciados y análisis
+
+Las consultas y criterios de aceptación están documentados
+en `../sql/exercises.md`.
+
+### Facturación por cliente
+
+Se relacionan clientes, pedidos y pedido_items mediante JOIN.
+
+La agrupación se realiza por cliente para evitar obtener una
+fila por cada pedido.
+
+### Clientes sin pedidos
+
+Se utiliza LEFT JOIN junto con IS NULL para identificar
+clientes que no aparecen en la tabla pedidos.
+
+### Facturación mensual
+
+Se utiliza EXTRACT(MONTH FROM p.fecha) para conservar
+el año y el mes de la facturación.
+
+### Seguridad y permisos
+
+- tienda_readonly: SELECT permitido y UPDATE denegado.
+- tienda_readwrite: operaciones DML permitidas.
+- Las inserciones de prueba se revierten con ROLLBACK.
+
+Las pruebas se realizan con SET ROLE desde una sesión
+administrativa. Los roles NOLOGIN no permiten iniciar
+sesión directamente.
+
+Los privilegios definidos se aplican a los objetos existentes.
+Los objetos futuros pueden requerir nuevos GRANT o
+ALTER DEFAULT PRIVILEGES.
 
 ## Validación
 
-La evidencia de recuentos, existencia de roles y prueba de denegación de
-escritura para `tienda_readonly` está en `validation.txt`.
+El archivo `validation.txt` recoge:
+
+1) Recuentos de las cuatro tablas.
+2) Clientes sin pedidos.
+3) Existencia de ambos roles.
+4) Privilegios sobre los objetos.
+5) Lectura permitida a tienda_readonly.
+6) Modificación denegada a tienda_readonly.
+7) Inserción permitida a tienda_readwrite.
+8) ROLLBACK y comprobación posterior del recuento.
+
+Criterio de cierre: todas las comprobaciones coinciden
+con los resultados reales del laboratorio.

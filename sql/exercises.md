@@ -30,11 +30,12 @@ y ordenar cronológicamente.
 
 Criterio de aceptación: 12 meses con la carga original.
 
-## Consulta 4: ranking de clientes
+## Consulta 4: facturación por cliente con y sin CTE
 
-Mostrar nombre, facturación total y posición de cada cliente.
+Calcular la facturación total de los clientes con pedidos utilizando una CTE
+y una consulta directa con JOIN, ordenando por facturación descendente.
 
-Criterio de aceptación: 20 clientes con pedidos.
+Criterio: veinte filas y los mismos importes en ambas consultas.
 
 ## Comprobación de roles y permisos
 

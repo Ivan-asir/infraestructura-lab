@@ -5,7 +5,6 @@ productos=100
 pedidos=200
 pedido_items=200
 
-
 === 2) Clientes sin pedidos ===
 
  id |   nombre
@@ -16,7 +15,6 @@ pedido_items=200
  24 | Cliente 24
 (4 filas)
 
-
 === 3) Roles del laboratorio ===
 
      rolname      | rolcanlogin
@@ -24,7 +22,6 @@ pedido_items=200
  tienda_readonly  | f
  tienda_readwrite | f
 (2 filas)
-
 
 === 4) Privilegios ===
 
@@ -51,7 +48,6 @@ pedido_items=200
          |                  |           | tienda_readwrite=rU/postgres   |                                  |
 (7 filas)
 
-
 === 5) Lectura como tienda_readonly ===
 
 SET
@@ -60,7 +56,6 @@ SET
     24
 (1 fila)
 
-
 === 6) Escritura denegada a tienda_readonly ===
 
 BEGIN
@@ -68,14 +63,12 @@ SET
 ERROR:  permiso denegado a la tabla productos
 OK: escritura denegada por permisos.
 
-
 === 7) Inserción con tienda_readwrite y ROLLBACK ===
 
 BEGIN
 SET
 INSERT 0 1
 ROLLBACK
-
 
 === 8) Verificación final ===
 

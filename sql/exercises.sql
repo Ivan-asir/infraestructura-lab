@@ -26,7 +26,7 @@ SELECT
 FROM pedidos p
 JOIN pedido_items pi ON p.id = pi.pedido_id
 GROUP BY mes, anio
-ORDER BY mes, anio;
+ORDER BY anio, mes;
 
 -- Ranking de clientes (con CTE)
 

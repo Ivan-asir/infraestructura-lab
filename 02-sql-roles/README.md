@@ -44,13 +44,17 @@ fila por cada pedido.
 
 ### Clientes sin pedidos
 
-Se utiliza LEFT JOIN junto con IS NULL para identificar
+Se utiliza subconsulta WHERE NOT EXISTS para identificar
 clientes que no aparecen en la tabla pedidos.
 
 ### Facturación mensual
 
-Se utiliza EXTRACT(MONTH FROM p.fecha) para conservar
-el año y el mes de la facturación.
+Se utiliza EXTRACT(MONTH FROM p.fecha) y EXTRACT(YEAR FROM p.fecha)
+para conservar el mes y el año de la facturación.
+
+### Facturación por cliente (con/sin CTE)
+
+Se utiliza una consulta directa con JOIN y una CTE.
 
 ### Seguridad y permisos
 

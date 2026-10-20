@@ -1,7 +1,7 @@
-# PostgreSQL de pruebas emplando Docker Compose
+# PostgreSQL de pruebas empleando Docker Compose
 
 Desde `docker/`, validar con `docker compose config --quiet`, iniciar con
-`docker compose up -d` y comprobar el servicio `db` mediante `docker ps -a`.
+`docker compose up -d` y comprobar el servicio `db_postgres_tienda` mediante `docker compose ps`.
 
 La instancia usa `../sql/schema.sql`, `../sql/seed.sql` y un volumen con nombre.
 Al inicializar una base vacía debe haber 24 clientes, 100 productos,

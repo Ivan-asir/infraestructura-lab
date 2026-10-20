@@ -9,7 +9,7 @@
     - `NAMES db_postgres_tienda`
 
 - Recuentos iniciales:
-    - `docker exec db_postgres_tienda psql -U postgres -d tienda -Atc 'SELECT count(*) FROM clientes;'` 25
+    - `docker exec db_postgres_tienda psql -U postgres -d tienda -Atc 'SELECT count(*) FROM clientes;'` 24
 
     - `docker exec db_postgres_tienda psql -U postgres -d tienda -Atc 'SELECT count(*) FROM productos;'` 100
 
@@ -18,7 +18,7 @@
     - `docker exec db_postgres_tienda psql -U postgres -d tienda -Atc 'SELECT count(*) FROM pedido_items;'` 200
 
 - Persistencia de `persistencia@example.test` tras stop/start:
-    - `docker exec db_postgres_tienda psql -U postgres -d tienda -Atc \ "SELECT count(*) FROM clientes WHERE email = 'persistencia@example.test';"` 1
+    - `docker exec db_postgres_tienda psql -U postgres -d tienda -Atc "SELECT count(*) FROM clientes WHERE email = 'persistencia@example.test';"` 1
 
 - Workflow `validate.yml` (enlace y estado): PENDIENTE
 

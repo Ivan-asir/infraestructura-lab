@@ -44,7 +44,7 @@ Su inclusión en el alcance no implica que estén instaladas.
 | Monitorización y troubleshooting | Pendiente |
 | Replicación | Pendiente |
 | Ansible | Pendiente |
-| Docker Compose y CI | Pendiente |
+| Docker Compose y CI | OK |
 | Oracle Database Free | Pendiente |
 | Kubernetes | Pendiente |
 

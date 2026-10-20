@@ -1,27 +1,49 @@
 # Validación de Docker y CI
 
-- Docker Engine: 29.9.1
+## 1. Entorno
 
-- Docker Compose: v5.6.0
+| Componente | Versión |
+|---|---|
+| Docker Engine | 29.9.1 |
+| Docker Compose | v5.6.0 |
+| Imagen PostgreSQL | 18 |
+| Contenedor | `db_postgres_tienda` |
+| Estado | Healthy |
 
-- Servicio `db_postgres_tienda` (`docker ps -a`):
-    - `STATUS Up 25 minutes (healthy)`
-    - `NAMES db_postgres_tienda`
+La instancia PostgreSQL se ejecuta en un contenedor independiente de la máquina virtual `pg-primary`.
 
-- Recuentos iniciales:
-    - `docker exec db_postgres_tienda psql -U postgres -d tienda -Atc 'SELECT count(*) FROM clientes;'` 24
+## 2. Validación de datos
 
-    - `docker exec db_postgres_tienda psql -U postgres -d tienda -Atc 'SELECT count(*) FROM productos;'` 100
+Se ha comprobado la correcta inicialización de la base de datos `tienda` mediante los scripts `sql/schema.sql` y `sql/seed.sql`.
 
-    - `docker exec db_postgres_tienda psql -U postgres -d tienda -Atc 'SELECT count(*) FROM pedidos;'` 200
+| Tabla | Registros iniciales |
+|---|---:|
+| `clientes` | 24 |
+| `productos` | 100 |
+| `pedidos` | 200 |
+| `pedido_items` | 200 |
 
-    - `docker exec db_postgres_tienda psql -U postgres -d tienda -Atc 'SELECT count(*) FROM pedido_items;'` 200
+**Resultado:** los recuentos iniciales coinciden con los datos esperados.
 
-- Persistencia de `persistencia@example.test` tras stop/start:
-    - `docker exec db_postgres_tienda psql -U postgres -d tienda -Atc "SELECT count(*) FROM clientes WHERE email = 'persistencia@example.test';"` 1
+## 3. Prueba de persistencia
 
-- Workflow `validate.yml` (enlace y estado): PENDIENTE
+Se ha insertado un cliente de prueba con el correo `persistencia@example.test` y se ha comprobado su permanencia tras detener y arrancar nuevamente el contenedor mediante `docker compose stop` y `docker compose start`.
 
-- Workflow `postgresql-tests.yml` (enlace y estado): PENDIENTE
+**Resultado:** el registro continúa existiendo después del reinicio (1 coincidencia).
 
-- Incidencias y solución aplicada: PENDIENTE
+Esto confirma la persistencia de los datos almacenados en el volumen Docker utilizado por PostgreSQL.
+
+## 4. Integración continua
+
+Se han ejecutado correctamente los dos workflows configurados en GitHub Actions.
+
+| Workflow | Estado | Evidencia |
+|---|---|---|
+| `validate.yml` | Correcto | [Ver ejecución](https://github.com/Ivan-asir/postgresql-dba/actions/runs/39417186845) |
+| `postgresql-tests.yml` | Correcto | [Ver ejecución](https://github.com/Ivan-asir/postgresql-dba/actions/runs/39417186632) |
+
+El primero valida los archivos del repositorio y el segundo comprueba automáticamente la creación del esquema y la carga de datos SQL.
+
+## 5. Conclusión
+
+El laboratorio PostgreSQL en Docker funciona correctamente, los datos persisten tras detener y arrancar el contenedor y ambos workflows de GitHub Actions han finalizado satisfactoriamente.

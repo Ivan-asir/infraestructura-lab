@@ -1,0 +1,49 @@
+name: PostgreSQL SQL checks
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  sql:
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:18
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: lab-ci-only
+          POSTGRES_DB: tienda
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U postgres -d tienda"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 10
+    env:
+      PGPASSWORD: lab-ci-only
+      PGHOST: 127.0.0.1
+      PGPORT: "5432"
+      PGUSER: postgres
+      PGDATABASE: tienda
+    steps:
+      - name: Obtener el repositorio
+        uses: actions/checkout@v4
+      - name: Instalar cliente PostgreSQL
+        run: |
+          sudo apt update
+          sudo apt install -y postgresql-client
+      - name: Crear tablas e insertar datos
+        run: |
+          psql -v ON_ERROR_STOP=1 -f sql/schema.sql
+          psql -v ON_ERROR_STOP=1 -f sql/seed.sql
+      - name: Ejecutar las consultas SQL
+        run: psql -v ON_ERROR_STOP=1 -f sql/exercises.sql
+      - name: Comprobar recuentos
+        run: |
+          test "$(psql -At -c 'SELECT count(*) FROM clientes')" = "24"
+          test "$(psql -At -c 'SELECT count(*) FROM productos')" = "100"
+          test "$(psql -At -c 'SELECT count(*) FROM pedidos')" = "200"
+          test "$(psql -At -c 'SELECT count(*) FROM pedido_items')" = "200"

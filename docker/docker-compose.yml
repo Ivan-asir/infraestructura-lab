@@ -1,0 +1,23 @@
+services:
+  db_postgres_tienda:
+    image: postgres:18
+    container_name: db_postgres_tienda
+    restart: "no"
+    environment:
+      POSTGRES_DB: tienda
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+    ports:
+      - "127.0.0.1:15432:5432"
+    volumes:
+      - pg_lab_data:/var/lib/postgresql
+      - ../sql/schema.sql:/docker-entrypoint-initdb.d/01-schema.sql:ro
+      - ../sql/seed.sql:/docker-entrypoint-initdb.d/02-seed.sql:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d tienda"]
+      interval: 10s
+      timeout: 5s
+      retries: 12
+
+volumes:
+  pg_lab_data:

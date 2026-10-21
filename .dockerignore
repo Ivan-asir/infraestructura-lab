@@ -1,0 +1,15 @@
+# Excluir archivos sensibles en la construcción de la imagen
+.git
+**/.env
+**/.env.*
+**/.pgpass
+**/.ssh
+**/*.dump
+**/*.backup
+**/*.bak
+**/*.pem
+**/*.ppk
+**/*.key
+**/*.p12
+**/*.pfx
+**/*.sql.gz

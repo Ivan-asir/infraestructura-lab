@@ -1,4 +1,4 @@
-name: Validate repository
+name: Validar repositorio
 on:
   push:
   pull_request:

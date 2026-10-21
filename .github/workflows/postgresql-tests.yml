@@ -1,4 +1,4 @@
-name: PostgreSQL SQL checks
+name: Pruebas SQLs
 on:
   push:
   pull_request:

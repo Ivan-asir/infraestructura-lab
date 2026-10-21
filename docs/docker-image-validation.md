@@ -2,7 +2,7 @@
 
 ## 1) Objetivo y alcance
 
-Construir una imagen propia de PostgreSQL 18 que incorpore los scripts `sql/schema.sql` y `sql/seed.sql`, desplegarla mediante `docker/image/compose.yaml` y demostrar que funciona sin sustituir el contenedor principal `db_postgres_tienda`.
+Construir una imagen propia de PostgreSQL 18 que incorpore los scripts `sql/schema.sql` y `sql/seed.sql`, desplegarla mediante `docker/image/docker-compose.yml` y demostrar que funciona sin sustituir el contenedor principal `db_postgres_tienda`.
 
 La imagen contiene **scripts de inicialización**, no una base de datos ya cargada ni una copia de seguridad. Los scripts se procesan únicamente al inicializar un directorio de datos vacío.
 
@@ -21,7 +21,7 @@ La imagen contiene **scripts de inicialización**, no una base de datos ya carga
 | Elemento o comprobación | Configuración esperada | Resultado obtenido |
 |---|---|---|
 | Dockerfile | `docker/image/Dockerfile` | Presente |
-| Archivo Compose | `docker/image/docker-compose.yaml` | Presente |
+| Archivo Compose | `docker/image/docker-compose.yml` | Presente |
 | Validación de Compose | Sin errores | Correcto (código 0) |
 | Servicio declarado | `db_postgres_tienda_imagen` | `db_postgres_tienda_imagen` |
 | Imagen base | `postgres:18` | `FROM postgres:18` comprobado en `docker/image/Dockerfile` |
@@ -34,7 +34,7 @@ La imagen contiene **scripts de inicialización**, no una base de datos ya carga
 
 | Elemento | Resultado esperado | Resultado obtenido |
 |---|---|---|
-| Proyecto Compose | `tienda-imagen-lab` | Declarado en `docker/image/docker-compose.yaml` |
+| Proyecto Compose | `tienda-imagen-lab` | Declarado en `docker/image/docker-compose.yml` |
 | Servicio y contenedor | `db_postgres_tienda_imagen` | running |
 | Imagen utilizada por el contenedor | `postgresql-tienda:lab` | `postgresql-tienda:lab` |
 | Healthcheck | `healthy` | healthy |
@@ -82,7 +82,7 @@ La imagen contiene **scripts de inicialización**, no una base de datos ya carga
 |---|---|
 | Imagen alternativa | `postgresql-tienda:github` |
 | Repositorio de origen | `https://github.com/Ivan-asir/postgresql-dba.git` |
-| Commit exacto utilizado | sha256:8b77472bfbbb166dac0ff5472f8e38e6fe4bc176701ed744620d1a75a5cf1ab7 |
+| Identificador de imagen generado | `sha256:8b77472bfbbb166dac0ff5472f8e38e6fe4bc176701ed744620d1a75a5cf1ab7` |
 | Resultado de la construcción remota | Imagen `postgresql-tienda:github` creada con ID `8b77472bfbbb` |
 
 ## 8) Incidencias, conclusión y evidencias

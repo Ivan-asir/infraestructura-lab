@@ -10,4 +10,4 @@ La prueba de persistencia usa `docker compose stop` y `docker compose start`.
 
 No se publican `docker/.env`, claves ni el volumen.
 
-La construcción de una imagen propia (sin datos persistentes) se documenta en `docker/image/Dockerfile`; el despliegue se define en `docker/image/docker-compose.yaml` mediante el proyecto independiente `tienda-imagen-lab`. La construcción y sus pruebas se registran en `docs/docker-image-validation.md`. Para el build se utiliza la raíz del repositorio como contexto y se excluyen secretos mediante `.dockerignore`.
+La construcción de una imagen propia (sin datos persistentes) se documenta en `docker/image/Dockerfile`; el despliegue se define en `docker/image/docker-compose.yml` mediante el proyecto independiente `tienda-imagen-lab`. La construcción y sus pruebas se registran en `docs/docker-image-validation.md`. Para el build se utiliza la raíz del repositorio como contexto y se excluyen secretos mediante `.dockerignore`.

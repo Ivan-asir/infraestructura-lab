@@ -6,7 +6,7 @@ services:
     environment:
       POSTGRES_DB: tienda
       POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?Define POSTGRES_PASSWORD en docker/.env}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?Define POSTGRES_PASSWORD en docker/.env}
     ports:
       - "127.0.0.1:15432:5432"
     volumes:

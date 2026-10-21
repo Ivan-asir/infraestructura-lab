@@ -1,13 +1,13 @@
--- Facturación por cliente
+-- Consulta 1: clasificación de clientes por importe total de pedidos
 
 SELECT c.id AS id_cliente, c.nombre AS nombre_cliente, SUM(pi.cantidad * pi.precio_unitario) AS total_factura
 FROM clientes c
 JOIN pedidos p ON c.id = p.cliente_id
 JOIN pedido_items pi ON p.id = pi.pedido_id
 GROUP BY id_cliente, nombre_cliente
-ORDER BY total_factura DESC;
+ORDER BY total_factura DESC, id_cliente;
 
--- Clientes sin pedidos
+-- Consulta 2: identificación de clientes sin pedidos
 
 SELECT c.id, c.nombre
 FROM clientes c
@@ -17,7 +17,7 @@ WHERE NOT EXISTS (
 	WHERE c.id = p.cliente_id
 );
 
--- Total por mes
+-- Consulta 3: análisis de la facturación mensual
 
 SELECT
 	EXTRACT(MONTH FROM p.fecha) AS mes,
@@ -28,7 +28,7 @@ JOIN pedido_items pi ON p.id = pi.pedido_id
 GROUP BY mes, anio
 ORDER BY anio, mes;
 
--- Facturación por cliente (con CTE)
+-- Consulta 4a: agregación por pedido mediante CTE
 
 WITH facturacion_por_pedido AS (
 	SELECT pi.pedido_id, SUM(pi.cantidad * pi.precio_unitario) AS total
@@ -39,12 +39,12 @@ SELECT p.cliente_id, SUM(fpp.total) AS facturacion_total_cliente
 FROM pedidos p
 JOIN facturacion_por_pedido fpp ON fpp.pedido_id = p.id
 GROUP BY p.cliente_id
-ORDER BY facturacion_total_cliente DESC;
+ORDER BY facturacion_total_cliente DESC, p.cliente_id;
 
--- Facturación por cliente (sin CTE)
+-- Consulta 4b: agregación directa por cliente sin CTE
 
 SELECT p.cliente_id, SUM(pi.cantidad * pi.precio_unitario) AS facturacion_total_cliente
 FROM pedidos p
 JOIN pedido_items pi ON pi.pedido_id = p.id
 GROUP BY p.cliente_id
-ORDER BY facturacion_total_cliente DESC;
+ORDER BY facturacion_total_cliente DESC, p.cliente_id;

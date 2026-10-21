@@ -32,7 +32,10 @@ fi
 
 echo
 echo "Comprobando archivos que no deberían subirse..."
-git ls-files | grep -E '(^|/)(\.env|\.pgpass|.*\.pem|.*\.key|.*\.dump|.*\.backup|vault\.yml)$'
+git ls-files \
+    | grep -Ev '(^|/)\.env\.example$' \
+    | grep -E '(^|/)(\.env(\.[^/]*)?|[^/]*\.env|\.pgpass|\.vault_pass|vault-password\.txt|vault\.yml|id_(rsa|ed25519)[^/]*|pg_lab_ed25519[^/]*|[^/]*\.(pem|ppk|key|p12|pfx|dump|backup|bak|sql\.gz))$|(^|/)\.ssh/'
+
 
 if [ $? -eq 0 ]; then
     echo "ERROR: hay archivos sensibles versionados."

@@ -35,24 +35,24 @@ No se versionan credenciales ni datos reales.
 Las consultas y criterios de aceptación están documentados
 en `../sql/exercises.md`.
 
-### Facturación por cliente
+### Clasificación de clientes por importe total de pedidos
 
 Se relacionan clientes, pedidos y pedido_items mediante JOIN.
 
 La agrupación se realiza por cliente para evitar obtener una
 fila por cada pedido.
 
-### Clientes sin pedidos
+### Identificación de clientes sin pedidos
 
 Se utiliza NOT EXISTS para identificar clientes
 que no aparecen en la tabla pedidos.
 
-### Facturación mensual
+### Análisis de la facturación mensual
 
 Se utilizan EXTRACT(MONTH FROM p.fecha) y EXTRACT(YEAR FROM p.fecha)
 para agrupar la facturación por año y mes.
 
-### Facturación por cliente (con/sin CTE)
+### Comparación de estrategias de agregación (CTE frente a cálculo directo)
 
 Se utiliza una consulta directa con JOIN y una CTE.
 

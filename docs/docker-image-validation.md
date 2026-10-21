@@ -24,7 +24,7 @@ La imagen contiene **scripts de inicialización**, no una base de datos ya carga
 | Archivo Compose | `docker/image/docker-compose.yaml` | Presente |
 | Validación de Compose | Sin errores | Correcto (código 0) |
 | Servicio declarado | `db_postgres_tienda_imagen` | `db_postgres_tienda_imagen` |
-| Imagen base | `postgres:18` | Revisar `FROM` en el Dockerfile |
+| Imagen base | `postgres:18` | `FROM postgres:18` comprobado en `docker/image/Dockerfile` |
 | Imagen personalizada | `postgresql-tienda:lab` | Imagen existente |
 | Identificador de imagen | Identificador `sha256:...` | `sha256:15f79b8c75cf5cb13a5634c997083de6ab1142f09841e26d7ce0061089d6fe7c` |
 | Construcción mediante `docker compose build` | Terminación sin errores | Construcción correcta |
@@ -75,3 +75,41 @@ La imagen contiene **scripts de inicialización**, no una base de datos ya carga
 | Recuentos `clientes\|productos\|pedidos\|pedido_items` | `24\|100\|200\|200` | `24\|100\|200\|200` |
 | Nombre del volumen asociado | `tienda-imagen-lab_pg_tienda_imagen_data` | `tienda-imagen-lab_pg_tienda_imagen_data` |
 | Estado de salud | `healthy` | `healthy` |
+
+## 7) Construcción desde GitHub
+
+| Comprobación | Resultado |
+|---|---|
+| Imagen alternativa | `postgresql-tienda:github` |
+| Repositorio de origen | `https://github.com/Ivan-asir/postgresql-dba.git` |
+| Commit exacto utilizado | sha256:8b77472bfbbb166dac0ff5472f8e38e6fe4bc176701ed744620d1a75a5cf1ab7 |
+| Resultado de la construcción remota | Imagen `postgresql-tienda:github` creada con ID `8b77472bfbbb` |
+
+## 8) Incidencias, conclusión y evidencias
+
+| Elemento | Resultado |
+|---|---|
+| Construcción de imagen local | Correcta según evidencias |
+| Contenedor adicional | `db_postgres_tienda_imagen` |
+| Estado de salud | `healthy` |
+| Recuentos SQL | `24\|100\|200\|200` |
+| Persistencia tras stop/start | Comprobada según evidencias |
+| Volumen utilizado | `tienda-imagen-lab_pg_tienda_imagen_data` |
+| Contenedor principal preservado | Identificadores antes/después coincidentes |
+| Construcción desde GitHub | Imagen creada correctamente |
+
+### Conclusión
+
+Las pruebas registradas muestran que se ha construido
+una imagen PostgreSQL personalizada a partir de
+`postgres:18`, incorporando los scripts del repositorio.
+
+El contenedor desplegado mediante Docker Compose funciona
+correctamente, presenta los recuentos esperados y conserva
+los datos tras detenerse y arrancarse nuevamente.
+
+Para ello se emplea un proyecto, puerto y volumen
+independientes de la instancia principal.
+
+La imagen contiene scripts de inicialización, no una base
+de datos precargada ni una copia de seguridad.

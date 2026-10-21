@@ -1,4 +1,4 @@
-name: Pruebas SQLs
+name: Pruebas SQL
 on:
   push:
   pull_request:

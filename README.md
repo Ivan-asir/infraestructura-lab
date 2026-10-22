@@ -38,7 +38,7 @@ Su inclusión en el alcance no implica que estén instaladas.
 | Preparación de Rocky Linux | OK |
 | Instalación de PostgreSQL | OK |
 | SQL, roles y permisos | OK |
-| Backup y restore | Pendiente |
+| Backup y restore | OK |
 | PITR | Pendiente |
 | Rendimiento | Pendiente |
 | Monitorización y troubleshooting | Pendiente |

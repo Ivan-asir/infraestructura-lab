@@ -1,12 +1,17 @@
 VALIDACIÓN DEL BACKUP LÓGICO DE POSTGRESQL
-========================================
+==========================================
 
 Servidor: pg-primary
+
 Fecha de recogida: 2026-10-22 12:15:56 CEST
+
 Base de datos original: tienda
-Dump seleccionado: /var/lib/pgsql/backups/tienda_22-10-2026.dump
+
+Dump seleccionado: /v/var/lib/pgsql/backups/tienda_22-10-2026.dump
+
 
 1) ARCHIVO Y CATÁLOGO DEL DUMP
+
 Tamaño: 14288 bytes | Propietario: postgres | Permisos: 600 | Modificado: 2026-10-22 11:37:29.352392955 +0200
 
 $ sudo -u postgres pg_restore --list "/var/lib/pgsql/backups/tienda_22-10-2026.dump" (primeras 25 líneas)
@@ -38,18 +43,24 @@ $ sudo -u postgres pg_restore --list "/var/lib/pgsql/backups/tienda_22-10-2026.d
 
 Resultado: catálogo legible. No equivale a restauración completa.
 
+
 2) RECUENTOS SQL
+
 Comando de consulta: SELECT count(*) FROM public.<tabla>;
+
 Las consultas se ejecutan mediante psql como usuario postgres.
-Base restaurada: NO INDICADA (no se ha verificado una restauración).
+
+Base de datos restaurada: tienda_restore
 
 Tabla            Original         Restaurada       Comparación
-clientes         24               -                NO VERIFICADO
-productos        100              -                NO VERIFICADO
-pedidos          200              -                NO VERIFICADO
-pedido_items     200              -                NO VERIFICADO
+clientes         24               24               Coincidente
+productos        100              100              Coincidente
+pedidos          200              200              Coincidente
+pedido_items     200              200              Coincidente
+
 
 3) SERVICIO DE BACKUP
+
 $ systemctl show pg-lab-backup.service -p Result -p ExecMainStatus
 Result=success
 ExecMainStatus=0
@@ -57,17 +68,43 @@ ExecMainStatus=0
 $ sudo journalctl -u pg-lab-backup.service -n 12 --no-pager
 -- No entries --
 
+
 4) TEMPORIZADOR
+
 $ systemctl is-enabled pg-lab-backup.timer
 enabled
+
 $ systemctl is-active pg-lab-backup.timer
 active
+
 $ systemctl list-timers --all --no-pager pg-lab-backup.timer
 NEXT                         LEFT     LAST                         PASSED    UNIT                ACTIVATES
 Fri 2026-10-23 00:02:24 CEST 11h left Thu 2026-10-22 11:37:29 CEST 38min ago pg-lab-backup.timer pg-lab-backup.service
-
 1 timers listed.
 
-5) CONCLUSIÓN
+
+5) RECUPERACIÓN DE LA TABLA PRODUCTOS
+
+Servidor: pg-primary
+Base de datos original: tienda
+Base de datos auxiliar: tienda_tabla_rescate
+Tabla recuperada: public.productos
+CSV de recuperación: /var/lib/pgsql/backups/productos_rescate.csv
+Fecha del CSV: 2026-10-21 17:47 CEST
+Dump original utilizado: /var/lib/pgsql/backups/tienda_22-10-2026.dump
+
+Resultados:
+ - Base de datos auxiliar con 100 productos: verificada.
+ - CSV importado con 100 identificadores únicos: verificado.
+ - Diferencias entre CSV y tabla original: 0.
+ - Reversión mediante ROLLBACK: verificada.
+ - Tabla temporal eliminada: verifificada.
+
+
+6) CONCLUSIONES
+
 Catálogo del dump: legible
-Comparación con base restaurada: registros coincidentes
+
+Comparación con base de datos restaurada: registros coincidentes
+
+Procedimiento de comparación y reversión de una recuperación de tabla validado satisfactoriamente.

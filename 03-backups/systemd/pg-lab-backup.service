@@ -1,0 +1,8 @@
+[Unit]
+Description=Backup lógico de la base tienda
+
+[Service]
+Type=oneshot
+User=postgres
+Group=postgres
+ExecStart=/usr/local/sbin/pg-lab-backup

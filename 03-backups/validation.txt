@@ -1,0 +1,73 @@
+VALIDACIÓN DEL BACKUP LÓGICO DE POSTGRESQL
+========================================
+
+Servidor: pg-primary
+Fecha de recogida: 2026-10-22 12:15:56 CEST
+Base de datos original: tienda
+Dump seleccionado: /var/lib/pgsql/backups/tienda_22-10-2026.dump
+
+1) ARCHIVO Y CATÁLOGO DEL DUMP
+Tamaño: 14288 bytes | Propietario: postgres | Permisos: 600 | Modificado: 2026-10-22 11:37:29.352392955 +0200
+
+$ sudo -u postgres pg_restore --list "/var/lib/pgsql/backups/tienda_22-10-2026.dump" (primeras 25 líneas)
+;
+; Archive created at 2026-10-22 11:37:29 CEST
+;     dbname: tienda
+;     TOC Entries: 41
+;     Compression: gzip
+;     Dump Version: 1.16-0
+;     Format: CUSTOM
+;     Integer: 4 bytes
+;     Offset: 8 bytes
+;     Dumped from database version: 18.6
+;     Dumped by pg_dump version: 18.6
+;
+;
+; Selected TOC Entries:
+;
+4401; 0 0 ACL - SCHEMA public pg_database_owner
+220; 1259 24578 TABLE public clientes postgres
+4402; 0 0 ACL public TABLE clientes postgres
+219; 1259 24577 SEQUENCE public clientes_id_seq postgres
+4403; 0 0 SEQUENCE OWNED BY public clientes_id_seq postgres
+4404; 0 0 ACL public SEQUENCE clientes_id_seq postgres
+225; 1259 24639 TABLE public pedido_items postgres
+4405; 0 0 ACL public TABLE pedido_items postgres
+222; 1259 24594 TABLE public pedidos postgres
+4406; 0 0 ACL public TABLE pedidos postgres
+
+Resultado: catálogo legible. No equivale a restauración completa.
+
+2) RECUENTOS SQL
+Comando de consulta: SELECT count(*) FROM public.<tabla>;
+Las consultas se ejecutan mediante psql como usuario postgres.
+Base restaurada: NO INDICADA (no se ha verificado una restauración).
+
+Tabla            Original         Restaurada       Comparación
+clientes         24               -                NO VERIFICADO
+productos        100              -                NO VERIFICADO
+pedidos          200              -                NO VERIFICADO
+pedido_items     200              -                NO VERIFICADO
+
+3) SERVICIO DE BACKUP
+$ systemctl show pg-lab-backup.service -p Result -p ExecMainStatus
+Result=success
+ExecMainStatus=0
+
+$ sudo journalctl -u pg-lab-backup.service -n 12 --no-pager
+-- No entries --
+
+4) TEMPORIZADOR
+$ systemctl is-enabled pg-lab-backup.timer
+enabled
+$ systemctl is-active pg-lab-backup.timer
+active
+$ systemctl list-timers --all --no-pager pg-lab-backup.timer
+NEXT                         LEFT     LAST                         PASSED    UNIT                ACTIVATES
+Fri 2026-10-23 00:02:24 CEST 11h left Thu 2026-10-22 11:37:29 CEST 38min ago pg-lab-backup.timer pg-lab-backup.service
+
+1 timers listed.
+
+5) CONCLUSIÓN
+Catálogo del dump: legible
+Comparación con base restaurada: registros coincidentes

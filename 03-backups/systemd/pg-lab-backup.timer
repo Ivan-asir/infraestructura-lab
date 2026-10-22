@@ -1,0 +1,11 @@
+[Unit]
+Description=Programar backup lógico de PostgreSQL
+
+[Timer]
+OnCalendar=daily
+Persistent=true
+RandomizedDelaySec=5m
+Unit=pg-lab-backup.service
+
+[Install]
+WantedBy=timers.target

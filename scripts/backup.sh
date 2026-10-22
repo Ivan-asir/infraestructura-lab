@@ -10,12 +10,18 @@ BD="tienda"
 # Directorio donde PostgreSQL guardará los backups
 DIRECTORIO_BACKUP="/var/lib/pgsql/backups"
 
-# Generar una marca temporal para que cada ejecución cree un nombre diferente
-FECHA="$(date +%d-%m-%Y_%H:%M:%S)"
-SALIDA="$DIRECTORIO_BACKUP/${BD}_${FECHA}.dump"
-
 # Verificar que el directorio de destino existe
 test -d "$DIRECTORIO_BACKUP"
+
+# Generar una marca temporal para que cada ejecución cree un nombre diferente
+FECHA="$(date +%d-%m-%Y_%H-%M-%S)"
+SALIDA="$DIRECTORIO_BACKUP/${BD}_${FECHA}.dump"
+
+# Comprobar si ya existe un fichero con el mismo nombre
+if [ -e "$SALIDA" ]; then
+    echo "ERROR: el archivo ya existe: $SALIDA" >&2
+    exit 1
+fi
 
 # Comprobar de forma silenciosa (-q) que PostgreSQL está aceptando conexiones
 pg_isready -q

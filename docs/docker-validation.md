@@ -39,8 +39,8 @@ Se han ejecutado correctamente los dos workflows configurados en GitHub Actions.
 
 | Workflow | Estado | Evidencia |
 |---|---|---|
-| `validate.yml` | Correcto | [Ver ejecución](https://github.com/Ivan-asir/postgresql-dba/actions/runs/39417186845) |
-| `postgresql-tests.yml` | Correcto | [Ver ejecución](https://github.com/Ivan-asir/postgresql-dba/actions/runs/39417186632) |
+| `validate.yml` | Correcto | [Ver ejecución](https://github.com/Ivan-asir/infraestructura-lab/actions/runs/39417186845) |
+| `postgresql-tests.yml` | Correcto | [Ver ejecución](https://github.com/Ivan-asir/infraestructura-lab/actions/runs/39417186632) |
 
 El primero valida los archivos del repositorio y el segundo comprueba automáticamente la creación del esquema y la carga de datos SQL.
 

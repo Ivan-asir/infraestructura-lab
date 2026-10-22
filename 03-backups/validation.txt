@@ -90,7 +90,7 @@ Resultados:
  - CSV importado con 100 identificadores únicos: verificado.
  - Diferencias entre CSV y tabla original: 0.
  - Reversión mediante ROLLBACK: verificada.
- - Tabla temporal eliminada: verifificada.
+ - Tabla temporal eliminada: verificada.
 
 
 6) CONCLUSIONES

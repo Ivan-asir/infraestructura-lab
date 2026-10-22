@@ -1,19 +1,17 @@
-# Laboratorio PostgreSQL DBA
+# Laboratorio de Sistemas, Bases de Datos y Automatización
 
-Laboratorio de administración PostgreSQL sobre Rocky Linux 9.
+Laboratorio técnico orientado a la administración de sistemas Linux, bases de datos,
+redes, contenedores, automatización y prácticas DevOps.
 
 ## Objetivo
 
-Instalación y administración de PostgreSQL, SQL, roles y permisos,
-backup y restore, PITR, rendimiento, monitorización, troubleshooting,
-replicación física y automatización con Ansible.
+Desarrollar un entorno práctico y reproducible para instalar, configurar, administrar,
+asegurar y supervisar servicios e infraestructuras.
 
-El laboratorio se amplía progresivamente hacia Docker,
-GitHub Actions, Oracle Database Free y Kubernetes.
+El proyecto parte de PostgreSQL y Rocky Linux, e incorpora progresivamente Docker, GitHub Actions,
+Ansible, Oracle Database Free y Kubernetes.
 
-El objetivo es relacionar administración DBA, sistemas Linux,
-automatización, contenedores y prácticas DevOps mediante
-ejercicios reproducibles y evidencias técnicas.
+Cada bloque combina configuraciones, scripts, procedimientos técnicos y evidencias de validación.
 
 ## Entorno de trabajo
 
@@ -26,9 +24,6 @@ ejercicios reproducibles y evidencias técnicas.
 - GitHub Actions.
 - Oracle Database Free.
 - Kubernetes con kind.
-
-Estas tecnologías se incorporarán progresivamente.
-Su inclusión en el alcance no implica que estén instaladas.
 
 ## Estado
 
@@ -47,6 +42,11 @@ Su inclusión en el alcance no implica que estén instaladas.
 | Docker Compose y CI | OK |
 | Oracle Database Free | Pendiente |
 | Kubernetes | Pendiente |
+
+## Guía de reproducción
+
+Para preparar un entorno nuevo y repetir las prácticas ya
+implementadas, consulta la [guía pública de reproducción](docs/guia-reproduccion.md).
 
 ## Alcance
 

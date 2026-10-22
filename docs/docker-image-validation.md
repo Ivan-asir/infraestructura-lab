@@ -81,7 +81,7 @@ La imagen contiene **scripts de inicialización**, no una base de datos ya carga
 | Comprobación | Resultado |
 |---|---|
 | Imagen alternativa | `postgresql-tienda:github` |
-| Repositorio de origen | `https://github.com/Ivan-asir/postgresql-dba.git` |
+| Repositorio histórico de origen | `https://github.com/Ivan-asir/postgresql-dba.git` |
 | Identificador de imagen generado | `sha256:8b77472bfbbb166dac0ff5472f8e38e6fe4bc176701ed744620d1a75a5cf1ab7` |
 | Resultado de la construcción remota | Imagen `postgresql-tienda:github` creada con ID `8b77472bfbbb` |
 

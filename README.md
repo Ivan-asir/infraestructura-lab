@@ -1,15 +1,12 @@
 # Laboratorio de Sistemas, Bases de Datos y Automatización
 
-Laboratorio técnico orientado a la administración de sistemas Linux, bases de datos,
-redes, contenedores, automatización y prácticas DevOps.
-
 ## Objetivo
 
 Desarrollar un entorno práctico y reproducible para instalar, configurar, administrar,
 asegurar y supervisar servicios e infraestructuras.
 
 El proyecto parte de PostgreSQL y Rocky Linux, e incorpora progresivamente Docker, GitHub Actions,
-Ansible, Oracle Database Free y Kubernetes.
+Ansible, Jenkins, Oracle Database Free y Kubernetes.
 
 Cada bloque combina configuraciones, scripts, procedimientos técnicos y evidencias de validación.
 
@@ -18,39 +15,41 @@ Cada bloque combina configuraciones, scripts, procedimientos técnicos y evidenc
 - VirtualBox
 - Rocky Linux 9
 - PostgreSQL
+- Jenkins
 - Ansible Core
 - Docker y Docker Compose.
 - WSL2.
 - GitHub Actions.
 - Oracle Database Free.
-- Kubernetes con kind.
+- Kubernetes.
 
 ## Estado
 
 | Apartado  | Estado |
 |---|---|
-| Red y SSH | OK |
-| Preparación de Rocky Linux | OK |
-| Instalación de PostgreSQL | OK |
-| SQL, roles y permisos | OK |
-| Backup y restore | OK |
-| PITR | Pendiente |
+| Red y SSH | `OK` |
+| Preparación de Rocky Linux | `OK` |
+| Instalación de PostgreSQL | `OK` |
+| SQL, roles y permisos | `OK` |
+| Backup y restore | `OK` |
+| PITR | `OK` |
 | Rendimiento | Pendiente |
 | Monitorización y troubleshooting | Pendiente |
 | Replicación | Pendiente |
+| Docker Compose y CI | `OK` |
+| Jenkins | Pendiente |
 | Ansible | Pendiente |
-| Docker Compose y CI | OK |
 | Oracle Database Free | Pendiente |
 | Kubernetes | Pendiente |
 
-## Guía de reproducción
+## Guía de ejecución
 
 Para preparar un entorno nuevo y repetir las prácticas ya
-implementadas, consulta la [guía pública de reproducción](docs/guia-reproduccion.md).
+implementadas, consultar la [guía de ejecución](docs/guia-ejecucion.md).
 
 ## Alcance
 
-Consulta `docs/scope.md`.
+Consultar `docs/scope.md`.
 
 ## Validación del repositorio
 

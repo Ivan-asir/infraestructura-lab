@@ -1,83 +1,31 @@
-=== 1) Recuentos de tablas ===
+VALIDACIÓN | 02 - SQL, ROLES Y PERMISOS
+=======================================
 
-clientes=24
-productos=100
-pedidos=200
-pedido_items=200
+1) CONTEXTO
+- Entorno: base tienda en pg-primary; esquema public.
+- Alcance: datos de prueba, roles NOLOGIN, permisos y transacciones.
+- Estado: VALIDADO.
 
-=== 2) Clientes sin pedidos ===
+2) COMPROBACIONES Y RESULTADOS
+- Recuentos: clientes=24; productos=100; pedidos=200; pedido_items=200.
+- Clientes sin pedidos: 4 (IDs 21, 22, 23 y 24).
+- Roles: tienda_readonly y tienda_readwrite; rolcanlogin=f en ambos.
+- Permisos: tienda_readonly tiene SELECT (r) en las cuatro tablas.
+- Permisos: tienda_readwrite tiene INSERT, SELECT, UPDATE y DELETE
+  (arwd) en las cuatro tablas; acceso rU a las secuencias listadas.
+- Lectura con SET ROLE tienda_readonly: COUNT(clientes)=24.
+- Escritura como tienda_readonly: ERROR "permiso denegado a la tabla productos"
+  (resultado esperado, control de permisos correcto).
+- INSERT con tienda_readwrite: INSERT 0 1; se ejecutó ROLLBACK.
+- Validación final: productos=100; productos_de_prueba=0.
 
- id |   nombre
-----+------------
- 21 | Cliente 21
- 22 | Cliente 22
- 23 | Cliente 23
- 24 | Cliente 24
-(4 filas)
+3) INCIDENCIAS Y LIMITACIONES
+- El error de permiso es una prueba negativa deliberada, no una incidencia.
+- Se resumen las concesiones observadas; consultar roles.sql para la definición.
 
-=== 3) Roles del laboratorio ===
+4) ESTADO FINAL Y REVERSIÓN
+- ROLLBACK probado: la inserción de prueba no persistió.
+- La carga inicial permaneció con 100 productos.
 
-     rolname      | rolcanlogin
-------------------+-------------
- tienda_readonly  | f
- tienda_readwrite | f
-(2 filas)
-
-=== 4) Privilegios ===
-
-                                                      Privilegios
- Esquema |      Nombre      |   Tipo    |          Privilegios           | Privilegios de acceso a columnas | Políticas
----------+------------------+-----------+--------------------------------+----------------------------------+-----------
- public  | clientes         | tabla     | postgres=arwdDxtm/postgres    +|                                  |
-         |                  |           | tienda_readonly=r/postgres    +|                                  |
-         |                  |           | tienda_readwrite=arwd/postgres |                                  |
- public  | clientes_id_seq  | secuencia | postgres=rwU/postgres         +|                                  |
-         |                  |           | tienda_readwrite=rU/postgres   |                                  |
- public  | pedido_items     | tabla     | postgres=arwdDxtm/postgres    +|                                  |
-         |                  |           | tienda_readonly=r/postgres    +|                                  |
-         |                  |           | tienda_readwrite=arwd/postgres |                                  |
- public  | pedidos          | tabla     | postgres=arwdDxtm/postgres    +|                                  |
-         |                  |           | tienda_readonly=r/postgres    +|                                  |
-         |                  |           | tienda_readwrite=arwd/postgres |                                  |
- public  | pedidos_id_seq   | secuencia | postgres=rwU/postgres         +|                                  |
-         |                  |           | tienda_readwrite=rU/postgres   |                                  |
- public  | productos        | tabla     | postgres=arwdDxtm/postgres    +|                                  |
-         |                  |           | tienda_readonly=r/postgres    +|                                  |
-         |                  |           | tienda_readwrite=arwd/postgres |                                  |
- public  | productos_id_seq | secuencia | postgres=rwU/postgres         +|                                  |
-         |                  |           | tienda_readwrite=rU/postgres   |                                  |
-(7 filas)
-
-=== 5) Lectura como tienda_readonly ===
-
-SET
- count
--------
-    24
-(1 fila)
-
-=== 6) Escritura denegada a tienda_readonly ===
-
-BEGIN
-SET
-ERROR:  permiso denegado a la tabla productos
-OK: escritura denegada por permisos.
-
-=== 7) Inserción con tienda_readwrite y ROLLBACK ===
-
-BEGIN
-SET
-INSERT 0 1
-ROLLBACK
-
-=== 8) Verificación final ===
-
- total_productos
------------------
-             100
-(1 fila)
-
- productos_de_prueba
----------------------
-                   0
-(1 fila)
+5) CONCLUSIÓN
+- Datos, lectura/escritura segregadas y reversión transaccional validados.

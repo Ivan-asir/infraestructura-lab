@@ -1,100 +1,39 @@
-VALIDACIÓN DEL BACKUP LÓGICO DE POSTGRESQL
-==========================================
+VALIDACIÓN | 03 - BACKUP LÓGICO Y RESTAURACIÓN
+==============================================
 
-Servidor: pg-primary
-Fecha de recogida: 2026-10-22 12:15:56 CEST
-Base de datos original: tienda
-Dump seleccionado: /var/lib/pgsql/backups/tienda_22-10-2026.dump
+1) CONTEXTO
+- Entorno: pg-primary (PostgreSQL 18.6); base de datos original tienda.
+- Alcance: dump lógico, restauración completa, tabla selectiva y timer.
+- Estado: VALIDADO (restauración de prueba y recuperación selectiva).
+- Dump utilizado: /var/lib/pgsql/backups/tienda_22-10-2026.dump.
 
+2) COMPROBACIONES Y RESULTADOS
+- Dump: 14288 bytes; propietario postgres; permisos 0600.
+- Fecha de modificación: 2026-10-22 11:37:29.352392955 +0200.
+- pg_restore --list: catálogo legible; CUSTOM, gzip, 41 entradas;
+  servidor de origen PostgreSQL 18.6, pg_dump 18.6.
+- Restauración completa en tienda_restore: recuentos iguales a tienda:
+  clientes=24, productos=100, pedidos=200, pedido_items=200.
+- Servicio pg-lab-backup.service: Result=success; ExecMainStatus=0.
+- Timer pg-lab-backup.timer: enabled y active al registrar evidencia.
+- Próxima ejecución indicada entonces: 2026-10-23 00:02:24 CEST.
+- Recuperación selectiva: public.productos en tienda_tabla_rescate,
+  100 filas; CSV /var/lib/pgsql/backups/productos_rescate.csv.
+- Fecha documentada del CSV: 2026-10-21 17:47 CEST.
+- CSV: 100 IDs únicos; diferencias con tabla original=0.
+- Prueba de importación temporal: COPY 100; ROLLBACK ejecutado;
+  tabla temporal eliminada y sin cambios en la tabla original.
 
-1) ARCHIVO Y CATÁLOGO DEL DUMP
+3) INCIDENCIAS Y LIMITACIONES
+- pg_restore --list por sí solo no prueba una restauración: se validó
+  adicionalmente en tienda_restore y tienda_tabla_rescate.
+- El estado del timer es histórico, no una lectura en tiempo real.
 
-Tamaño: 14288 bytes | Propietario: postgres | Permisos: 600 | Modificado: 2026-10-22 11:37:29.352392955 +0200
+4) ESTADO FINAL Y REVERSIÓN
+- Base de datos original tienda conservada sin modificaciones por la restauración.
+- Recuperación selectiva y reversión de la inserción: verificadas.
+- No se ejecutó una restauración destructiva sobre tienda.
 
-$ sudo -u postgres pg_restore --list "/var/lib/pgsql/backups/tienda_22-10-2026.dump" (primeras 25 líneas)
-;
-; Archive created at 2026-10-22 11:37:29 CEST
-;     dbname: tienda
-;     TOC Entries: 41
-;     Compression: gzip
-;     Dump Version: 1.16-0
-;     Format: CUSTOM
-;     Integer: 4 bytes
-;     Offset: 8 bytes
-;     Dumped from database version: 18.6
-;     Dumped by pg_dump version: 18.6
-;
-;
-; Selected TOC Entries:
-;
-4401; 0 0 ACL - SCHEMA public pg_database_owner
-220; 1259 24578 TABLE public clientes postgres
-4402; 0 0 ACL public TABLE clientes postgres
-219; 1259 24577 SEQUENCE public clientes_id_seq postgres
-4403; 0 0 SEQUENCE OWNED BY public clientes_id_seq postgres
-4404; 0 0 ACL public SEQUENCE clientes_id_seq postgres
-225; 1259 24639 TABLE public pedido_items postgres
-4405; 0 0 ACL public TABLE pedido_items postgres
-222; 1259 24594 TABLE public pedidos postgres
-4406; 0 0 ACL public TABLE pedidos postgres
-
-Resultado: catálogo legible. No equivale a restauración completa.
-
-
-2) RECUENTOS SQL
-
-Comando de consulta: SELECT count(*) FROM public.<tabla>;
-Las consultas se ejecutan mediante psql como usuario postgres.
-Base de datos restaurada: tienda_restore
-
-Tabla            Original         Restaurada       Comparación
-clientes         24               24               Coincidente
-productos        100              100              Coincidente
-pedidos          200              200              Coincidente
-pedido_items     200              200              Coincidente
-
-
-3) SERVICIO DE BACKUP
-
-$ systemctl show pg-lab-backup.service -p Result -p ExecMainStatus
-Result=success
-ExecMainStatus=0
-$ sudo journalctl -u pg-lab-backup.service -n 12 --no-pager
--- No entries --
-
-
-4) TEMPORIZADOR
-
-$ systemctl is-enabled pg-lab-backup.timer
-enabled
-$ systemctl is-active pg-lab-backup.timer
-active
-$ systemctl list-timers --all --no-pager pg-lab-backup.timer
-NEXT                         LEFT     LAST                         PASSED    UNIT                ACTIVATES
-Fri 2026-10-23 00:02:24 CEST 11h left Thu 2026-10-22 11:37:29 CEST 38min ago pg-lab-backup.timer pg-lab-backup.service
-1 timers listed.
-
-
-5) RECUPERACIÓN DE LA TABLA PRODUCTOS
-
-Servidor: pg-primary
-Base de datos original: tienda
-Base de datos auxiliar: tienda_tabla_rescate
-Tabla recuperada: public.productos
-CSV de recuperación: /var/lib/pgsql/backups/productos_rescate.csv
-Fecha del CSV: 2026-10-21 17:47 CEST
-Dump original utilizado: /var/lib/pgsql/backups/tienda_22-10-2026.dump
-
-Resultados:
- - Base de datos auxiliar con 100 productos: verificada.
- - CSV importado con 100 identificadores únicos: verificado.
- - Diferencias entre CSV y tabla original: 0.
- - Reversión mediante ROLLBACK: verificada.
- - Tabla temporal eliminada: verificada.
-
-
-6) CONCLUSIONES
-
-Catálogo del dump: legible
-Comparación con base de datos restaurada: registros coincidentes
-Procedimiento de comparación y reversión de una recuperación de tabla validado satisfactoriamente.
+5) CONCLUSIÓN
+- Dump legible, restauración completa probada, copia automática correcta
+  y recuperación de una tabla verificada sin alterar la base original.

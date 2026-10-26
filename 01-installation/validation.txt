@@ -1,27 +1,27 @@
-=== Estado inicial de PostgreSQL ===
+VALIDACIÓN | 01 - INSTALACIÓN DE POSTGRESQL
+===========================================
 
-$ sudo -u postgres pg_isready
-/var/run/postgresql:5432 - aceptando conexiones
+1) CONTEXTO
+- Entorno: pg-primary (Rocky Linux); PostgreSQL 18.6.
+- Alcance: servicio nativo, configuración local y objetos iniciales.
+- Estado: VALIDADO.
 
-$ sudo -u postgres psql -Atc "SELECT version();"
-PostgreSQL 18.6 on x86_64-redhat-linux-gnu, compiled by gcc (GCC) 11.5.0 20240719 (Red Hat 11.5.0-14), 64-bit
+2) COMPROBACIONES Y RESULTADOS
+- Disponibilidad (pg_isready): /var/run/postgresql:5432, aceptando conexiones.
+- Motor (SELECT version()): PostgreSQL 18.6, x86_64-redhat-linux-gnu.
+- Unidad postgresql.service: habilitada (enabled) y activa (active).
+- listen_addresses: localhost.
+- Rol app_user: existe; rolcanlogin = t.
+- Base appdb: existe; propietario = app_user.
+- Esquema app: existe en appdb; propietario = app_user.
 
-$ systemctl is-enabled postgresql.service
-enabled
+3) INCIDENCIAS Y LIMITACIONES
+- La salida confirma el estado al recogerla, no la disponibilidad actual.
 
-$ systemctl is-active postgresql.service
-active
+4) ESTADO FINAL Y REVERSIÓN
+- Estado final observado: servicio operativo y objetos iniciales presentes.
+- Reversión: NO APLICA, se trata de la instalación inicial
+  y no se realiza ninguna reversión durante esta validación.
 
-$ sudo -u postgres psql -Atc "SHOW listen_addresses;"
-localhost
-
-=== Objetos iniciales de PostgreSQL ===
-
-$ Comprobación del rol app_user
-app_user|t
-
-$ Comprobación de appdb
-appdb|app_user
-
-$ Comprobación del esquema app
-app|app_user
+5) CONCLUSIÓN
+- Instalación y objetos iniciales comprobados en el entorno.

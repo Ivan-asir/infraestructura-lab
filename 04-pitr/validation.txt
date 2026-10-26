@@ -1,0 +1,43 @@
+VALIDACIÓN | 04 - WAL Y RECUPERACIÓN PITR
+=========================================
+
+1) CONTEXTO
+- Entorno: pg-primary, Rocky Linux 9, PostgreSQL 18.6.
+- Alcance: recuperación física del clúster; prueba en tienda.public.pitr_marker.
+- Fecha: 2026-10-23 (Europe/Madrid, CEST).
+- Estado: PITR y retorno al PGDATA original VALIDADOS.
+
+2) COMPROBACIONES Y RESULTADOS
+- Objetivo PITR: 2026-10-23 08:55:25.354183+00 (UTC).
+- Log: recuperación detenida antes del COMMIT de la transacción 932,
+  fechada 2026-10-23 10:56:35.782884 CEST.
+- Pausa: pg_is_in_recovery()=t; estado=paused.
+- Incidencia observada: AccessExclusiveLock del proceso startup
+  sobre pitr_marker durante la pausa.
+- Finalización: pg_wal_replay_resume() ejecutado correctamente.
+- Tras PITR: pg_is_in_recovery()=f.
+- Fila recuperada: "Fila que debe sobrevivir" (1 fila).
+- Archivo registrado por pg_stat_archiver: 00000002.history,
+  2026-10-23 09:47:58.831194 UTC (historial de timeline).
+- Copia base: /var/lib/pgsql/backups/pitr-base.
+- PG_VERSION y backup_manifest: PRESENTES.
+- pg_verifybackup --no-parse-wal: CORRECTO.
+
+3) INCIDENCIAS Y LIMITACIONES
+- El bloqueo durante la pausa impidió leer la tabla hasta finalizar PITR.
+- La verificación automática completa de WAL no pudo ejecutarse:
+  pg_verifybackup no localizó pg_waldump.
+
+4) ESTADO FINAL Y REVERSIÓN
+- Método: restauración del PGDATA original con PostgreSQL detenido.
+- Directorio original activo: /var/lib/pgsql/data.
+- Clúster PITR conservado: /var/lib/pgsql/data-pitr-20261023.
+- Servicio postgresql.service: active.
+- pg_is_in_recovery() tras reversión: f.
+- public.pitr_marker: AUSENTE (estado original posterior al DROP).
+- Recuentos: clientes=24; productos=100; pedidos=200; pedido_items=200.
+- Snapshot 04_backup_logico_restauracion: disponible, no utilizado.
+- Retorno al clúster original: VALIDADO.
+
+5) CONCLUSIÓN
+- Recuperación PITR y restauración del estado original: VALIDADAS.

@@ -1,6 +1,6 @@
 # Guía de ejecución del laboratorio de Sistemas, Bases de Datos y Automatización
 
-> **Documento de ejecución.** Resume los pasos para reproducir las prácticas que actualmente tienen archivos y evidencias en este repositorio: red, Rocky Linux, PostgreSQL nativo, SQL y roles, Docker/CI, backup lógico y restauración.
+> **Documento de ejecución.** Resume los pasos para reproducir las prácticas de este laboratorio.
 
 ## 1. Requisitos y recorrido
 
@@ -17,11 +17,14 @@ Orden sugerido:
 1. Preparar la VM y la red.
 2. Instalar PostgreSQL nativo e inicializar el laboratorio SQL.
 3. Aplicar roles y ejecutar consultas.
-4. Configurar el backup y probar una restauración aislada.
-5. En otro entorno, iniciar Docker Compose y probar la imagen propia.
-6. Validar el repositorio y consultar los resultados de GitHub Actions.
+4. Configurar el backup lógico y probar una restauración aislada.
+5. Realizar WAL/PITR **solo en una VM aislada, con punto de retorno verificado**.
+6. En otro entorno, iniciar Docker Compose y probar la imagen propia.
+7. Validar el repositorio y consultar los resultados de GitHub Actions.
 
-Los documentos `docs/network.md`, `docs/rocky-baseline.md`, `01-installation/README.md`, `02-sql-roles/README.md`, `03-backups/README.md` y `docs/docker-validation.md` contienen la configuración y los resultados registrados en el laboratorio original. Sus evidencias sirven de referencia, **no son salidas garantizadas en otro equipo**.
+Los documentos `docs/network.md`, `docs/rocky-baseline.md`, `01-installation/README.md`, `02-sql-roles/README.md`, `03-backups/README.md`, `04-pitr/README.md` y `docs/docker-validation.md` contienen la configuración y los resultados registrados en el laboratorio original. Sus evidencias sirven de referencia, **no son salidas garantizadas en otro equipo**.
+
+Las evidencias `validation.txt` de cada capítulo utilizan la [misma estructura](formato-validaciones.md): contexto, resultados, incidencias, estado final/reversión y conclusión. No se deben publicar salidas de ejemplo como evidencias reales.
 
 ## 2. Descargar el repositorio
 
@@ -29,7 +32,7 @@ Los documentos `docs/network.md`, `docs/rocky-baseline.md`, `01-installation/REA
 
 ```bash
 git clone https://github.com/Ivan-asir/infraestructura-lab.git
-cd postgresql-dba
+cd infraestructura-lab
 bash scripts/validate-repository.sh
 ```
 
@@ -258,7 +261,20 @@ sudo systemctl disable --now pg-lab-backup.timer
 
 Consultar `03-backups/README.md` para objetivos y `03-backups/validation.txt` para los resultados registrados.
 
-## 8. Docker Compose y construcción de imagen propia (Ubuntu/WSL2)
+## 8. WAL, copia base y recuperación PITR (VM Rocky Linux)
+
+**Práctica de riesgo alto:** cambia la configuración de PostgreSQL, necesita reiniciar el servicio, y durante la restauración **detiene el clúster físico completo**, no solo la base `tienda`. No repetir sobre la instancia actual sin identificar el estado previo, el directorio de datos y un snapshot o resguardo validado. Esta sección resume la práctica realizada. El archivo [`04-pitr/README.md`](../04-pitr/README.md) complementa la guía con el entorno, las fases de recuperación, las comprobaciones de seguridad y los criterios de validación. No constituye por sí solo un procedimiento ejecutable completo de restauración.
+
+1. **Diagnóstico:** consultar `SHOW wal_level`, `SHOW archive_mode`, `SHOW archive_command`, espacio libre y estadísticas de `pg_stat_archiver`.
+2. **Archivado:** preparar `/var/lib/pgsql/wal_archive`, configurar únicamente los parámetros faltantes y comprobar la llegada de un segmento **nuevo** con `pg_switch_wal()`.
+3. **Copia física:** crear `/var/lib/pgsql/backups/pitr-base` sin reutilizar un destino con datos. Verificar con `pg_verifybackup` cuando estén disponibles sus dependencias. En la ejecución documentada, la comprobación de archivos y checksums se realizó correctamente con `--no-parse-wal`; la verificación automática adicional de WAL no se completó.
+4. **Punto objetivo:** insertar una fila sintética en `public.pitr_marker`, registrar `clock_timestamp()` **después de confirmar el INSERT** y efectuar `DROP TABLE` más tarde. Verificar los WAL disponibles antes de continuar.
+5. **Recuperación:** solo después de respaldar el estado original, detener PostgreSQL, colocar la copia base en el directorio de datos y configurar `restore_command`, `recovery_target_time` y `recovery.signal`.
+6. **Pausa y diagnóstico:** comprobar `pg_is_in_recovery()`, `pg_get_wal_replay_pause_state()` y los logs reales de PostgreSQL. **No exigir que `TABLE pitr_marker` responda durante la pausa:** un `AccessExclusiveLock` reproducido desde WAL puede impedir la lectura.
+7. **Finalización controlada:** si los logs confirman el objetivo correcto y existe un retorno viable, ejecutar `pg_wal_replay_resume()`, comprobar que `pg_is_in_recovery()` devuelve `f` y **solo entonces** consultar el registro recuperado.
+8. **Retorno:** conservar la evidencia del clúster recuperado y devolver el PGDATA original previamente resguardado mediante un intercambio controlado de directorios, con PostgreSQL detenido. Validar después el servicio, las bases de datos y la ausencia de `pitr_marker`. El snapshot de VirtualBox queda como alternativa de reversión, previa comprobación de su estado y de los cambios que podrían perderse.
+
+## 9. Docker Compose y construcción de imagen propia (Ubuntu/WSL2)
 
 **Desde la copia del repositorio en Ubuntu/WSL2**, comprobar que Docker Desktop está arrancado e integrado con esa distribución:
 
@@ -306,7 +322,7 @@ docker exec db_postgres_tienda_imagen psql -U postgres -d tienda -c 'SELECT coun
 
 En estos comandos se parte de `docker/` después de iniciar el Compose principal; si se abre otra terminal, ir explícitamente a `docker/image/`. El volumen y los puertos son **distintos** a los del Compose principal. Evidencias: `docs/docker-validation.md` y `docs/docker-image-validation.md`.
 
-## 9. GitHub Actions y publicación
+## 10. GitHub Actions y publicación
 
 El repositorio contiene dos flujos en `.github/workflows/`:
 
@@ -326,7 +342,7 @@ git diff --cached
 
 Publicar únicamente archivos revisados. **No incluir:** `docker/.env`, claves privadas, dumps, directorios de datos, WAL, snapshots ni CSV con datos sensibles. La guía de flujo Git es `docs/repository-workflow.md`.
 
-## 10. Comprobaciones finales y limitaciones
+## 11. Comprobaciones finales y limitaciones
 
 Se considera completado el recorrido reproducible si hay conexión a `pg-primary`, PostgreSQL nativo responde, los SQL tienen los recuentos esperados, los roles funcionan según la documentación, se crea y restaura un dump en una base de datos auxiliar, ambos Compose pueden arrancar independientemente y los workflows terminan correctamente.
 

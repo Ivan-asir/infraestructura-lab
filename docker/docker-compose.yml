@@ -1,3 +1,5 @@
+name: infraestructura-lab-docker
+
 services:
   db_postgres_tienda:
     image: postgres:18

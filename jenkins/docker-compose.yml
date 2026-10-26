@@ -21,6 +21,8 @@ services:
     restart: unless-stopped
     env_file:
       - .env
+    volumes:
+      - jenkins_agent_ssh_host:/etc/ssh
     networks:
       - ci
     # SSH solo dentro de la red Docker; no se publica el puerto 22.
@@ -50,3 +52,4 @@ networks:
 volumes:
   jenkins_home:
   jenkins_pg_ci_data:
+  jenkins_agent_ssh_host:

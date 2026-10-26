@@ -10,6 +10,28 @@ Ansible, Jenkins, Oracle Database Free y Kubernetes.
 
 Cada bloque combina configuraciones, scripts, procedimientos técnicos y evidencias de validación.
 
+## Organización del repositorio
+
+Las prácticas de PostgreSQL se agrupan en `postgresql/` y se
+numeran según su orden de ejecución:
+
+- `postgresql/01-installation/`: instalación y validación inicial.
+- `postgresql/02-sql-roles/`: SQL, roles y permisos.
+- `postgresql/03-backups/`: backup lógico y restauración.
+- `postgresql/04-pitr/`: archivado WAL y recuperación PITR.
+- `postgresql/sql/`: esquema, datos y ejercicios SQL compartidos.
+
+El resto de tecnologías mantiene directorios independientes:
+
+- `docker/`: contenedores y construcción de imágenes.
+- `jenkins/`: CI autogestionada y agentes.
+- `.github/workflows/`: integración continua en GitHub Actions.
+- `scripts/`: scripts reutilizables.
+- `docs/`: documentación general y evidencias transversales.
+
+La numeración identifica las prácticas dentro de PostgreSQL;
+no representa una numeración global de todas las tecnologías.
+
 ## Entorno de trabajo
 
 - VirtualBox
@@ -37,7 +59,7 @@ Cada bloque combina configuraciones, scripts, procedimientos técnicos y evidenc
 | Monitorización y troubleshooting | Pendiente |
 | Replicación | Pendiente |
 | Docker Compose y CI | `OK` |
-| Jenkins | Pendiente |
+| Jenkins | `OK` |
 | Ansible | Pendiente |
 | Oracle Database Free | Pendiente |
 | Kubernetes | Pendiente |

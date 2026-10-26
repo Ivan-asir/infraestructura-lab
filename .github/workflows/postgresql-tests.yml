@@ -37,10 +37,10 @@ jobs:
           sudo apt install -y postgresql-client
       - name: Crear tablas e insertar datos
         run: |
-          psql -v ON_ERROR_STOP=1 -f sql/schema.sql
-          psql -v ON_ERROR_STOP=1 -f sql/seed.sql
+          psql -v ON_ERROR_STOP=1 -f postgresql/sql/schema.sql
+          psql -v ON_ERROR_STOP=1 -f postgresql/sql/seed.sql
       - name: Ejecutar las consultas SQL
-        run: psql -v ON_ERROR_STOP=1 -f sql/exercises.sql
+        run: psql -v ON_ERROR_STOP=1 -f postgresql/sql/exercises.sql
       - name: Comprobar recuentos
         run: |
           test "$(psql -At -c 'SELECT count(*) FROM clientes')" = "24"

@@ -51,8 +51,8 @@ Los roles son NOLOGIN y se prueban con SET ROLE.
 
 ## Evidencias
 
-- sql/exercises.sql: consultas resueltas.
-- 02-sql-roles/roles.sql: permisos configurados.
-- 02-sql-roles/validation.txt: resultados reales.
+- postgresql/sql/exercises.sql: consultas resueltas.
+- postgresql/02-sql-roles/roles.sql: permisos configurados.
+- postgresql/02-sql-roles/validation.txt: resultados reales.
 
 No se publican credenciales ni datos privados.

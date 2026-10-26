@@ -22,7 +22,7 @@ Orden sugerido:
 6. En otro entorno, iniciar Docker Compose y probar la imagen propia.
 7. Validar el repositorio y consultar los resultados de GitHub Actions.
 
-Los documentos `docs/network.md`, `docs/rocky-baseline.md`, `01-installation/README.md`, `02-sql-roles/README.md`, `03-backups/README.md`, `04-pitr/README.md` y `docs/docker-validation.md` contienen la configuración y los resultados registrados en el laboratorio original. Sus evidencias sirven de referencia, **no son salidas garantizadas en otro equipo**.
+Los documentos `docs/network.md`, `docs/rocky-baseline.md`, `postgresql/01-installation/README.md`, `postgresql/02-sql-roles/README.md`, `postgresql/03-backups/README.md`, `postgresql/04-pitr/README.md` y `docs/docker-validation.md` contienen la configuración y los resultados registrados en el laboratorio original. Sus evidencias sirven de referencia, **no son salidas garantizadas en otro equipo**.
 
 Las evidencias `validation.txt` de cada capítulo utilizan la [misma estructura](formato-validaciones.md): contexto, resultados, incidencias, estado final/reversión y conclusión. No se deben publicar salidas de ejemplo como evidencias reales.
 
@@ -107,10 +107,10 @@ La instalación de referencia escucha en `localhost`. Para estas prácticas **no
 
 **En la raíz del repositorio clonado en Rocky Linux, como `labadmin`:**
 
-El archivo `01-installation/create-lab-db.sql` crea `app_user`, `appdb` y el esquema `app`. **Ejecutar una vez, solamente si no existen esos objetos:**
+El archivo `postgresql/01-installation/create-lab-db.sql` crea `app_user`, `appdb` y el esquema `app`. **Ejecutar una vez, solamente si no existen esos objetos:**
 
 ```bash
-sudo -u postgres psql -v ON_ERROR_STOP=1 -d postgres < 01-installation/create-lab-db.sql
+sudo -u postgres psql -v ON_ERROR_STOP=1 -d postgres < postgresql/01-installation/create-lab-db.sql
 ```
 
 Establecer la contraseña del rol, si se necesita autenticación por contraseña, **interactivamente**:
@@ -125,8 +125,8 @@ Dentro de `psql`: `\password app_user` y, para salir, `\q`. No escribir contrase
 
 ```bash
 sudo -u postgres createdb tienda
-sudo -u postgres psql -v ON_ERROR_STOP=1 -d tienda < sql/schema.sql
-sudo -u postgres psql -v ON_ERROR_STOP=1 -d tienda < sql/seed.sql
+sudo -u postgres psql -v ON_ERROR_STOP=1 -d tienda < postgresql/sql/schema.sql
+sudo -u postgres psql -v ON_ERROR_STOP=1 -d tienda < postgresql/sql/seed.sql
 ```
 
 La redirección `<` permite que la terminal de `labadmin` lea los SQL del repositorio y envíe su contenido a `psql` ejecutado como `postgres`, incluso cuando `postgres` no tiene acceso directo al directorio personal de `labadmin`.
@@ -138,18 +138,18 @@ sudo -u postgres psql -d tienda -c 'SELECT count(*) FROM pedidos;'
 sudo -u postgres psql -d tienda -c 'SELECT count(*) FROM pedido_items;'
 ```
 
-Recuentos de referencia: **24, 100, 200 y 200**. Las fechas de los pedidos se calculan a partir de `now()` en `sql/seed.sql`, por lo que serán relativas al día de la carga.
+Recuentos de referencia: **24, 100, 200 y 200**. Las fechas de los pedidos se calculan a partir de `now()` en `postgresql/sql/seed.sql`, por lo que serán relativas al día de la carga.
 
 ## 6. SQL, roles y permisos
 
 **Sobre una instalación nueva de `tienda`**, crear una sola vez los roles definidos en el repositorio:
 
 ```bash
-sudo -u postgres psql -v ON_ERROR_STOP=1 -d tienda < 02-sql-roles/roles.sql
-sudo -u postgres psql -v ON_ERROR_STOP=1 -d tienda < sql/exercises.sql
+sudo -u postgres psql -v ON_ERROR_STOP=1 -d tienda < postgresql/02-sql-roles/roles.sql
+sudo -u postgres psql -v ON_ERROR_STOP=1 -d tienda < postgresql/sql/exercises.sql
 ```
 
-Los roles `tienda_readonly` y `tienda_readwrite` son `NOLOGIN`: se prueban desde una sesión administrativa con `SET ROLE`, no con conexiones directas. Para comprobaciones de permisos y resultados, consultar `sql/exercises.md`, `02-sql-roles/README.md` y `02-sql-roles/validation.txt`. Las pruebas DML deben revertirse con `ROLLBACK` para mantener la carga original.
+Los roles `tienda_readonly` y `tienda_readwrite` son `NOLOGIN`: se prueban desde una sesión administrativa con `SET ROLE`, no con conexiones directas. Para comprobaciones de permisos y resultados, consultar `postgresql/sql/exercises.md`, `postgresql/02-sql-roles/README.md` y `postgresql/02-sql-roles/validation.txt`. Las pruebas DML deben revertirse con `ROLLBACK` para mantener la carga original.
 
 ## 7. Backup lógico y restauración (VM Rocky Linux)
 
@@ -173,8 +173,8 @@ sudo install -o root -g root -m 0755 scripts/backup.sh /usr/local/sbin/pg-lab-ba
 Instalar unidades systemd y habilitar el temporizador:
 
 ```bash
-sudo install -o root -g root -m 0644 03-backups/systemd/pg-lab-backup.service /etc/systemd/system/pg-lab-backup.service
-sudo install -o root -g root -m 0644 03-backups/systemd/pg-lab-backup.timer /etc/systemd/system/pg-lab-backup.timer
+sudo install -o root -g root -m 0644 postgresql/03-backups/systemd/pg-lab-backup.service /etc/systemd/system/pg-lab-backup.service
+sudo install -o root -g root -m 0644 postgresql/03-backups/systemd/pg-lab-backup.timer /etc/systemd/system/pg-lab-backup.timer
 sudo systemctl daemon-reload
 sudo systemctl enable --now pg-lab-backup.timer
 ```
@@ -251,7 +251,7 @@ ORDER BY id;
 ROLLBACK;
 ```
 
-Finalmente salir con `\q`. La consulta muestra **solo las diferencias**: si devuelve cero filas, los datos comprobados coinciden, pero eso no demuestra que haya existido una corrupción real. `ROLLBACK` elimina la tabla temporal de esta transacción y descarta cualquier modificación no confirmada. La evidencia resumida está en `03-backups/validation.txt`.
+Finalmente salir con `\q`. La consulta muestra **solo las diferencias**: si devuelve cero filas, los datos comprobados coinciden, pero eso no demuestra que haya existido una corrupción real. `ROLLBACK` elimina la tabla temporal de esta transacción y descarta cualquier modificación no confirmada. La evidencia resumida está en `postgresql/03-backups/validation.txt`.
 
 Rollback de la instalación del temporizador, si fuera necesario (no elimina los dumps):
 
@@ -259,11 +259,11 @@ Rollback de la instalación del temporizador, si fuera necesario (no elimina los
 sudo systemctl disable --now pg-lab-backup.timer
 ```
 
-Consultar `03-backups/README.md` para objetivos y `03-backups/validation.txt` para los resultados registrados.
+Consultar `postgresql/03-backups/README.md` para objetivos y `postgresql/03-backups/validation.txt` para los resultados registrados.
 
 ## 8. WAL, copia base y recuperación PITR (VM Rocky Linux)
 
-**Práctica de riesgo alto:** cambia la configuración de PostgreSQL, necesita reiniciar el servicio, y durante la restauración **detiene el clúster físico completo**, no solo la base `tienda`. No repetir sobre la instancia actual sin identificar el estado previo, el directorio de datos y un snapshot o resguardo validado. Esta sección resume la práctica realizada. El archivo [`04-pitr/README.md`](../04-pitr/README.md) complementa la guía con el entorno, las fases de recuperación, las comprobaciones de seguridad y los criterios de validación. No constituye por sí solo un procedimiento ejecutable completo de restauración.
+**Práctica de riesgo alto:** cambia la configuración de PostgreSQL, necesita reiniciar el servicio, y durante la restauración **detiene el clúster físico completo**, no solo la base `tienda`. No repetir sobre la instancia actual sin identificar el estado previo, el directorio de datos y un snapshot o resguardo validado. Esta sección resume la práctica realizada. El archivo [`postgresql/04-pitr/README.md`](../postgresql/04-pitr/README.md) complementa la guía con el entorno, las fases de recuperación, las comprobaciones de seguridad y los criterios de validación. No constituye por sí solo un procedimiento ejecutable completo de restauración.
 
 1. **Diagnóstico:** consultar `SHOW wal_level`, `SHOW archive_mode`, `SHOW archive_command`, espacio libre y estadísticas de `pg_stat_archiver`.
 2. **Archivado:** preparar `/var/lib/pgsql/wal_archive`, configurar únicamente los parámetros faltantes y comprobar la llegada de un segmento **nuevo** con `pg_switch_wal()`.

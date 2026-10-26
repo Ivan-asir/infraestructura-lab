@@ -10,11 +10,15 @@ VALIDACIÓN | JENKINS - CI AUTOGESTIONADA
 - Nodo jenkins_agent: ONLINE.
 - Ejecutores: controlador=0; agente=1.
 - Identidad SSH del agente: verificada mediante clave de host configurada manualmente.
+- Persistencia SSH: volumen jenkins_agent_ssh_host montado en /etc/ssh.
+- Huella SSH tras recreación: COINCIDE.
 - Pipeline: infraestructura-lab-validacion, build #2.
 - Etapas: "Diagnóstico del agente", "Obtener código" y "Validar repositorio"; todas correctas.
 - Resultado del pipeline: SUCCESS.
 
 3) INCIDENCIAS Y LIMITACIONES
+- Incidencia: cambio de clave de host SSH tras recrear el contenedor.
+- Corrección: volumen persistente para /etc/ssh y verificación de la nueva clave.
 - Pruebas SQL: no incluidas en el Jenkinsfile.
 
 4) ESTADO FINAL Y REVERSIÓN

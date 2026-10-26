@@ -1,0 +1,26 @@
+VALIDACIÓN | JENKINS - CI AUTOGESTIONADA
+========================================
+
+1) CONTEXTO
+- Entorno: Ubuntu/WSL2, Docker Compose y Jenkins con agente SSH.
+- Commit probado: dba1bc1fe08d0c39f6e9cfdcadd2d68637888408
+
+2) COMPROBACIONES Y RESULTADOS
+- Contenedores: controller y agente activos; PostgreSQL CI activo y healthy.
+- Nodo jenkins_agent: ONLINE.
+- Ejecutores: controlador=0; agente=1.
+- Identidad SSH del agente: verificada mediante clave de host configurada manualmente.
+- Pipeline: infraestructura-lab-validacion, build #2.
+- Etapas: "Diagnóstico del agente", "Obtener código" y "Validar repositorio"; todas correctas.
+- Resultado del pipeline: SUCCESS.
+
+3) INCIDENCIAS Y LIMITACIONES
+- Pruebas SQL: no incluidas en el Jenkinsfile.
+
+4) ESTADO FINAL Y REVERSIÓN
+- Estado final: controlador y agente operativos; pipeline ejecutado correctamente.
+- Parada controlada: docker compose down.
+- Volúmenes persistentes: jenkins_home y jenkins_pg_ci_data presentes.
+
+5) CONCLUSIÓN
+- Jenkins y ejecución del pipeline: VALIDADOS.

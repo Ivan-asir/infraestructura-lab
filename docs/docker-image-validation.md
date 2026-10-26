@@ -2,7 +2,7 @@
 
 ## 1) Objetivo y alcance
 
-Construir una imagen propia de PostgreSQL 18 que incorpore los scripts `sql/schema.sql` y `sql/seed.sql`, desplegarla mediante `docker/image/docker-compose.yml` y demostrar que funciona sin sustituir el contenedor principal `db_postgres_tienda`.
+Construir una imagen propia de PostgreSQL 18 que incorpore los scripts `postgresql/sql/schema.sql` y `postgresql/sql/seed.sql`, desplegarla mediante `docker/image/docker-compose.yml` y demostrar que funciona sin sustituir el contenedor principal `db_postgres_tienda`.
 
 La imagen contiene **scripts de inicialización**, no una base de datos ya cargada ni una copia de seguridad. Los scripts se procesan únicamente al inicializar un directorio de datos vacío.
 

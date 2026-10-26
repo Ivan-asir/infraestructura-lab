@@ -14,7 +14,7 @@ La instancia PostgreSQL se ejecuta en un contenedor independiente de la máquina
 
 ## 2. Validación de datos
 
-Se ha comprobado la correcta inicialización de la base de datos `tienda` mediante los scripts `sql/schema.sql` y `sql/seed.sql`.
+Se ha comprobado la correcta inicialización de la base de datos `tienda` mediante los scripts `postgresql/sql/schema.sql` y `postgresql/sql/seed.sql`.
 
 | Tabla | Registros iniciales |
 |---|---:|

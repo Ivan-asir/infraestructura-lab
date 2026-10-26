@@ -1,0 +1,52 @@
+# Entorno únicamente empleado para CI (no utiliza la base tienda de pg-primary)
+
+name: infraestructura-lab-jenkins
+
+services:
+  jenkins_controller:
+    image: jenkins/jenkins:lts-jdk21
+    container_name: jenkins_controller
+    restart: unless-stopped
+    ports:
+      - "127.0.0.1:18080:8080"
+    volumes:
+      - jenkins_home:/var/jenkins_home
+    networks:
+      - ci
+
+  jenkins_agent:
+    build:
+      context: ./agent
+    container_name: jenkins_agent
+    restart: unless-stopped
+    env_file:
+      - .env
+    networks:
+      - ci
+    # SSH solo dentro de la red Docker; no se publica el puerto 22.
+
+  jenkins_postgres_ci:
+    image: postgres:18
+    container_name: jenkins_postgres_ci
+    restart: unless-stopped
+    env_file:
+      - .env
+    volumes:
+      - jenkins_pg_ci_data:/var/lib/postgresql
+      - ./initdb/01-create-ci-role.sh:/docker-entrypoint-initdb.d/01-create-ci-role.sh:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+    networks:
+      - ci
+    # No se publica PostgreSQL al anfitrion ni a pg-primary.
+
+networks:
+  ci:
+    internal: false
+
+volumes:
+  jenkins_home:
+  jenkins_pg_ci_data:

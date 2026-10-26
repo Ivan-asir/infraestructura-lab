@@ -1,0 +1,54 @@
+pipeline {
+    agent { label 'jenkins-lab' }
+
+    options {
+        timestamps()
+        timeout(time: 10, unit: 'MINUTES')
+        disableConcurrentBuilds()
+        skipDefaultCheckout()
+    }
+
+    stages {
+        stage('Diagnostico del agente') {
+            steps {
+                sh '''
+                    set -eu
+                    printf 'Equipo: '; hostname
+                    printf 'Usuario: '; whoami
+                    git --version
+                    bash --version | head -n 1
+                '''
+            }
+        }
+
+        stage('Obtener codigo') {
+            steps {
+                checkout scm
+            }
+        }
+
+        stage('Validar repositorio') {
+            steps {
+                sh '''
+                    set -eu
+                    test -f jenkins/Jenkinsfile
+                    test -f jenkins/docker-compose.yml
+                    test -f jenkins/agent/Dockerfile
+                    test -f jenkins/initdb/01-create-ci-role.sh
+                    bash -n jenkins/initdb/01-create-ci-role.sh
+
+                    if [ -f scripts/validate-repository.sh ]; then
+                        bash scripts/validate-repository.sh
+                    else
+                        echo 'Validador general no presente: solo validacion basica de Jenkins.'
+                    fi
+                '''
+            }
+        }
+    }
+
+    post {
+        success { echo 'VALIDACION CORRECTA: pipeline de Jenkins.' }
+        failure { echo 'VALIDACION FALLIDA: inspeccionar el primer stage rojo.' }
+    }
+}

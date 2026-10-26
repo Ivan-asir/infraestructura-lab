@@ -344,6 +344,15 @@ Publicar únicamente archivos revisados. **No incluir:** `docker/.env`, claves p
 
 ## 11. Comprobaciones finales y limitaciones
 
-Se considera completado el recorrido reproducible si hay conexión a `pg-primary`, PostgreSQL nativo responde, los SQL tienen los recuentos esperados, los roles funcionan según la documentación, se crea y restaura un dump en una base de datos auxiliar, ambos Compose pueden arrancar independientemente y los workflows terminan correctamente.
+Los bloques 01 a 04 se consideran completados cuando:
+
+- PostgreSQL nativo está instalado y operativo en `pg-primary`.
+- La base de datos `tienda` contiene los recuentos esperados.
+- Los roles y permisos funcionan según lo documentado.
+- El backup lógico se ha restaurado correctamente en bases auxiliares.
+- El archivado WAL y la recuperación PITR han sido validados.
+- El retorno al `PGDATA` original se ha comprobado sin pérdida de los datos principales del laboratorio.
+
+Los contenidos relativos a Docker Compose y GitHub Actions se validan por separado mediante sus propias evidencias y ejecuciones de CI.
 
 **Referencias:** [PostgreSQL 18](https://www.postgresql.org/docs/18/), [Rocky Linux](https://docs.rockylinux.org/), [Docker Compose](https://docs.docker.com/compose/), [systemd.timer](https://www.freedesktop.org/software/systemd/man/latest/systemd.timer.html).

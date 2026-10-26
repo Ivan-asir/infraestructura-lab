@@ -89,7 +89,7 @@ Esto no incluye la comprobación automática adicional de WAL.
 
 ## 3. Instante objetivo
 
-Se crea una fila de prueba en `public.pitr_marker` y se registró
+Se creó una fila de prueba en `public.pitr_marker` y se registró
 un instante UTC después de confirmar su inserción.
 
 Posteriormente se ejecutó `DROP TABLE` para provocar la pérdida

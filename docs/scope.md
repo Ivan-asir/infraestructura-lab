@@ -33,11 +33,24 @@ cuando se hayan realizado y validado.
 - Ejecución automatizada de pruebas SQL.
 - Comprobación de los recuentos de datos de prueba.
 
+## Jenkins
+
+- CI autogestionada con controlador, agente SSH y PostgreSQL aislado.
+- Persistencia de configuración, datos e identidad SSH de servidor.
+- Pipeline sobre un agente y comprobación de su ejecución.
+
+## Kubernetes
+
+- Clúster local `kind` en WSL2, API accesible solo por loopback.
+- Deployment Nginx, Service ClusterIP, ConfigMap y probes HTTP.
+- Dos réplicas disponibles y acceso local a la aplicación.
+- Historial de despliegues e investigación de incidencias.
+
 ## Evidencias
 
 Cada práctica conserva documentación técnica y resultados reales
 de validación. Las evidencias `validation.txt` siguen el formato
-definido en `docs/formato-validaciones.md`.
+definido en `docs/plantilla-validaciones.md`.
 
 Las tecnologías y acciones todavía no ejecutadas se incorporarán
 al repositorio cuando corresponda.

@@ -21,9 +21,10 @@ numeran según su orden de ejecución:
 - `postgresql/04-pitr/`: archivado WAL y recuperación PITR.
 - `postgresql/sql/`: esquema, datos y ejercicios SQL compartidos.
 
-El resto de tecnologías mantiene directorios independientes:
+El resto de tecnologías mantiene directorios independientes, por ejemplo:
 
 - `docker/`: contenedores y construcción de imágenes.
+- `kubernetes/`: clúster `kind`, aplicación Nginx y diagnóstico.
 - `jenkins/`: CI autogestionada y agentes.
 - `.github/workflows/`: integración continua en GitHub Actions.
 - `scripts/`: scripts reutilizables.
@@ -47,27 +48,33 @@ no representa una numeración global de todas las tecnologías.
 
 ## Estado
 
-| Apartado  | Estado |
-|---|---|
-| Red y SSH | `OK` |
-| Preparación de Rocky Linux | `OK` |
-| Instalación de PostgreSQL | `OK` |
-| SQL, roles y permisos | `OK` |
-| Backup y restore | `OK` |
-| PITR | `OK` |
-| Rendimiento | Pendiente |
-| Monitorización y troubleshooting | Pendiente |
-| Replicación | Pendiente |
-| Docker Compose y CI | `OK` |
-| Jenkins | `OK` |
-| Ansible | Pendiente |
-| Oracle Database Free | Pendiente |
-| Kubernetes | Pendiente |
+| Apartado                                    | Estado    |
+| ------------------------------------------- | --------- |
+| Red y SSH                                   | `OK`    |
+| Preparación de Rocky Linux                 | `OK`    |
+| Instalación de PostgreSQL                  | `OK`    |
+| SQL, roles y permisos                       | `OK`    |
+| Backup y restore                            | `OK`    |
+| PITR                                        | `OK`    |
+| Rendimiento                                 | Pendiente |
+| Monitorización y troubleshooting           | Pendiente |
+| Replicación                                | Pendiente |
+| Docker Compose y CI                         | `OK`    |
+| Jenkins                                     | `OK`    |
+| Ansible                                     | Pendiente |
+| Oracle Database Free                        | Pendiente |
+| Kubernetes (creación de clúster `kind`) | `OK`    |
+| Kubernetes (Deployment y Service) | `OK` |
+| Kubernetes (K3: estado posterior) | Comprobado |
 
-## Guía de ejecución
+## Reproducir las prácticas
 
-Para preparar un entorno nuevo y repetir las prácticas ya
-implementadas, consultar la [guía de ejecución](docs/guia-ejecucion.md).
+La [guía pública de ejecución](docs/guia-ejecucion.md) organiza los comandos por bloque y entorno.
+Los README de cada módulo detallan su configuración y las evidencias conservadas.
+
+## Documentación técnica
+
+Los procedimientos reproducibles, las dependencias y los criterios de aceptación se encuentran en los README de `postgresql/`, `docker/`, `jenkins/` y `kubernetes/`. Las comprobaciones ejecutadas se recogen en los respectivos `validation.txt` y en `docs/`.
 
 ## Alcance
 
@@ -90,5 +97,4 @@ dumps, WAL, discos de máquinas virtuales ni datos ajenos al laboratorio.
 
 ## Aviso
 
-Este repositorio documenta un laboratorio de práctica. No representa una
-configuración preparada para producción.
+Este repositorio documenta un laboratorio de práctica. No representa una configuración preparada para producción.

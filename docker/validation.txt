@@ -1,0 +1,25 @@
+VALIDACIÓN | 07 - DOCKER COMPOSE
+================================
+
+1) CONTEXTO
+- Entorno: Ubuntu/WSL2 y Docker Desktop; servicio db_postgres_tienda
+- Evidencia: `../docs/docker-validation.md` (Docker Engine 29.9.1; Compose 5.6.0; PostgreSQL 18).
+- Estado: VALIDADO
+- Alcance: PostgreSQL de pruebas, datos iniciales y persistencia
+
+2) COMPROBACIONES Y RESULTADOS
+- `../docs/docker-validation.md`: contenedor `db_postgres_tienda` con healthcheck `healthy`.
+- SQL: 24 clientes, 100 productos, 200 pedidos y 200 filas de `pedido_items`.
+- Persistencia: el registro `persistencia@example.test` seguía presente tras `docker compose down` / `up`.
+- GitHub Actions: `validate.yml` y `postgresql-tests.yml` ejecutados correctamente (IDs 39417186845 y 39417186632).
+
+3) INCIDENCIAS Y LIMITACIONES
+- La evidencia es histórica y no prueba que el contenedor permanezca arrancado hoy.
+- El incidente del puerto `34077` pertenece a la creación de `kind`, no a la validación de este servicio.
+
+4) ESTADO FINAL Y REVERSIÓN
+- La persistencia de los datos tras `down/up` quedó validada.
+- El servicio puede permanecer detenido sin invalidar las pruebas anteriores; conservar el volumen, sin `down -v`.
+
+5) CONCLUSIÓN
+- Despliegue, datos iniciales, persistencia y CI: VALIDADOS.

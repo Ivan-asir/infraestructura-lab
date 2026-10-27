@@ -1,36 +1,28 @@
 # WAL y recuperación PITR
 
-## Objetivo
+## 1. Objetivo y alcance
 
-Configurar el archivado WAL de PostgreSQL, realizar una copia base
-física y recuperar el clúster hasta un instante anterior a un
-`DROP TABLE`.
+Configurar el archivado WAL, realizar una copia base física y recuperar el clúster hasta un instante anterior a un `DROP TABLE`. **Afecta al clúster completo**, no solamente a `tienda`.
 
 La validación funcional se realiza sobre `tienda.public.pitr_marker`.
 
-## Entorno
+## 2. Entorno y requisitos
 
-- Servidor: `pg-primary`.
-- Sistema operativo: Rocky Linux 9.
-- PostgreSQL: 18.6, instalación nativa.
-- Directorio de datos: `/var/lib/pgsql/data`.
-- Archivo WAL: `/var/lib/pgsql/wal_archive`.
-- Copia base: `/var/lib/pgsql/backups/pitr-base`.
+- Host `pg-primary`, Rocky Linux 9, PostgreSQL 18.6.
+- PGDATA `/var/lib/pgsql/data`, WAL `/var/lib/pgsql/wal_archive`, copia base `/var/lib/pgsql/backups/pitr-base`.
+- Operación de alto impacto sobre el clúster físico completo.
 
-Esta recuperación afecta al clúster PostgreSQL completo, no solo
-a la base de datos `tienda`.
+## 3. Estructura de archivos
 
-## Requisitos de seguridad
+- `configuration.md`
+- `validation.txt`
+- `timeline.md`
 
-Ejecutar en una VM de laboratorio y con opciones para revertir cambios disponibles.
+## 4. Preparación
 
-Antes de detener PostgreSQL deben verificarse el servicio,
-las rutas, el espacio disponible y la existencia de la copia base.
+Verificar PostgreSQL, archivado WAL, integridad de la copia base y punto de retorno **antes** de detener servicios o mover `PGDATA`. No repetir la recuperación sobre el clúster activo para generar evidencias.
 
-No sobrescribir directorios existentes ni eliminar el clúster
-original para realizar la recuperación.
-
-## 1. Diagnóstico del archivado
+### Diagnóstico del archivado
 
 Desde `pg-primary`, como `labadmin`:
 
@@ -54,7 +46,9 @@ FROM pg_stat_archiver;
 
 El detalle de los parámetros está en `configuration.md`.
 
-## 2. Copia base
+## 5. Procedimiento de ejecución
+
+### Copia base
 
 La copia física se realiza con `pg_basebackup`, sobre un
 directorio de destino que no contenga archivos anteriores.
@@ -87,7 +81,7 @@ sudo -u postgres pg_verifybackup --no-parse-wal \
 
 Esto no incluye la comprobación automática adicional de WAL.
 
-## 3. Instante objetivo
+### Instante objetivo
 
 Se creó una fila de prueba en `public.pitr_marker` y se registró
 un instante UTC después de confirmar su inserción.
@@ -102,7 +96,7 @@ Objetivo registrado:
 Este instante pertenece a la ejecución documentada; no debe
 reutilizarse en una práctica nueva.
 
-## 4. Recuperación física
+### Recuperación física
 
 La recuperación requiere:
 
@@ -119,21 +113,11 @@ La configuración utilizada se describe en `configuration.md`.
 **Advertencia:** no repetir esta secuencia sobre el clúster actual
 sin comprobar antes los directorios y el procedimiento de retorno.
 
-## 5. Pausa y bloqueo observado
+## 6. Comprobaciones y criterios de aceptación
 
-Se alcanzó el instante objetivo con:
+Los criterios siguientes se contrastaron con los resultados registrados en `validation.txt`.
 
-- `pg_is_in_recovery() = t`.
-- `pg_get_wal_replay_pause_state() = paused`.
-
-La lectura de `public.pitr_marker` quedó bloqueada por un
-`AccessExclusiveLock` del proceso `startup` durante la recuperación.
-
-Por este motivo, la validación de la pausa se realizó mediante
-las funciones de recuperación y el log de PostgreSQL, no
-mediante una lectura bloqueante de la tabla.
-
-## 6. Finalización
+### Finalización
 
 Una vez confirmado el objetivo en los logs, se ejecutó:
 
@@ -153,7 +137,29 @@ Finalmente se pudo consultar `public.pitr_marker` y recuperar:
 
 `Fila que debe sobrevivir`
 
-## 7. Retorno al estado original
+## 7. Incidencias y limitaciones
+
+El bloqueo de lectura observado durante la pausa es una incidencia documentada; consultar la evidencia antes de reproducirla.
+
+### Pausa y bloqueo observado
+
+Se alcanzó el instante objetivo con:
+
+- `pg_is_in_recovery() = t`.
+- `pg_get_wal_replay_pause_state() = paused`.
+
+La lectura de `public.pitr_marker` quedó bloqueada por un
+`AccessExclusiveLock` del proceso `startup` durante la recuperación.
+
+Por este motivo, la validación de la pausa se realizó mediante
+las funciones de recuperación y el log de PostgreSQL, no
+mediante una lectura bloqueante de la tabla.
+
+## 8. Reversión y recuperación
+
+La evidencia histórica `validation.txt` acredita el retorno al PGDATA original. El snapshot `04_backup_logico_restauracion` quedó disponible, pero **no se utilizó**.
+
+### Retorno al estado original
 
 Se conservó el PGDATA anterior a PITR en:
 
@@ -175,7 +181,23 @@ El retorno se considera validado únicamente cuando:
 - Los recuentos principales de `tienda` son correctos.
 - El clúster PITR permanece conservado como evidencia.
 
-## Evidencias
+## 9. Seguridad
+
+Ejecutar en una VM de laboratorio y con opciones para revertir cambios disponibles.
+
+Antes de detener PostgreSQL deben verificarse el servicio,
+las rutas, el espacio disponible y la existencia de la copia base.
+
+No sobrescribir directorios existentes ni eliminar el clúster
+original para realizar la recuperación.
+
+## 10. Estado y evidencias
+
+- **Estado:** PITR y retorno al PGDATA original VALIDADOS.
+- **Evidencias:** `validation.txt` y `timeline.md`; configuración en `configuration.md`.
+- **Limitación documentada:** `pg_verifybackup --no-parse-wal` correcto; verificación WAL completa no ejecutada por ausencia de `pg_waldump`.
+
+### Evidencias
 
 Consultar `validation.txt` para los resultados reales, las
 incidencias encontradas y el estado de la reversión.

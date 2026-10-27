@@ -1,0 +1,43 @@
+VALIDACIÓN | 21 - KUBERNETES CON KIND
+==================================
+
+1) CONTEXTO
+- Fecha de la evidencia: 2026-10-27 (Europe/Madrid).
+- Entorno: Windows 11, Ubuntu/WSL2, Docker Desktop 4.97.0 y Docker Engine 29.9.2.
+- Clúster: infraestructura-lab-kubernetes; Kubernetes v1.37.0.
+- Contexto: kind-infraestructura-lab-kubernetes; API local 127.0.0.1:34567.
+- Aplicación: namespace web-lab, Deployment web-lab y Service web-lab.
+- Estado: K1 y K2 VALIDADOS; estado funcional posterior de K3 COMPROBADO.
+
+2) COMPROBACIONES Y RESULTADOS
+- `kind create cluster`: creación correcta; control-plane Ready después de 16 segundos.
+- `kind get clusters`: infraestructura-lab-kubernetes.
+- `docker port infraestructura-lab-kubernetes-control-plane 6443/tcp`: 127.0.0.1:34567.
+- `kubectl get nodes -o wide`: control-plane Ready; versión v1.37.0; Debian 13; containerd 2.3.4.
+- `kubectl -n web-lab get deployments,services,pods -o wide`: Deployment web-lab con 2/2 réplicas disponibles; Service ClusterIP 80/TCP.
+- Pods: dos Running, ambos 1/1 Ready y 0 reinicios en la observación.
+- `kubectl -n web-lab rollout status deployment/web-lab --timeout=30s`: successfully rolled out.
+- `kubectl -n web-lab rollout history deployment/web-lab`: revisiones 2 y 3 presentes.
+- `kubectl -n web-lab describe deployment web-lab`: revisión actual 3; 2 réplicas deseadas, 2 disponibles, ninguna no disponible.
+- Condiciones: Available=True / MinimumReplicasAvailable; Progressing=True / NewReplicaSetAvailable.
+- Imagen: nginx:stable-alpine; readiness y liveness por HTTP en puerto 80; ConfigMap web-html montado.
+- `kubectl -n web-lab get events --sort-by=.lastTimestamp`: sin eventos en el momento de consulta.
+- `kubectl -n web-lab port-forward svc/web-lab 18081:80`: conexión local aceptada.
+- `curl -i --max-time 10 http://127.0.0.1:18081/`: HTTP/1.1 200 OK el 2026-10-27 12:28:06 GMT; página con título "Laboratorio Kubernetes".
+
+3) INCIDENCIAS Y LIMITACIONES
+- El primer intento de crear `kind` falló al publicar TCP/34077, reservado por Windows en el intervalo 34018–34117.
+- Configurar 127.0.0.1:34567 permitió crear el clúster sin modificar las exclusiones de Windows.
+- Las revisiones 2 y 3 y el despliegue sano acreditan el estado posterior.
+
+4) ESTADO FINAL Y REVERSIÓN
+- Estado observado: control-plane Ready; dos Pods Running/Ready; servicio HTTP 200; rollout correcto; revisión 3.
+- Reversión de la incidencia inicial: cambio a puerto local 34567; no se alteraron las reservas de Windows.
+- K3: estado funcional posterior acreditado mediante Deployment disponible, revisión 3 y respuesta HTTP 200. La transcripción de la operación concreta
+  de reversión no forma parte de la evidencia conservada.
+
+5) CONCLUSIÓN
+- K1 (clúster): VALIDADO.
+- K2 (Deployment, Service, réplicas, probes y respuesta HTTP): VALIDADO.
+- K3: disponibilidad y nueva revisión posteriores COMPROBADAS.
+

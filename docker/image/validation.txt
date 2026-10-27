@@ -1,0 +1,25 @@
+VALIDACIÓN | 07 - IMAGEN DOCKER PROPIA
+======================================
+
+1) CONTEXTO
+- Entorno: Ubuntu/WSL2; proyecto Compose tienda-imagen-lab
+- Estado: VALIDADO para la ejecución descrita en `../../docs/docker-image-validation.md`
+- Alcance: Build y despliegue del servicio db_postgres_tienda_imagen
+
+2) COMPROBACIONES Y RESULTADOS
+- Construcción: imagen `postgresql-tienda:lab`, ID `sha256:15f79b8c75cf5cb13a5634c997083de6ab1142f09841e26d7ce0061089d6fe7c`.
+- PostgreSQL `18.6`; contenedor `db_postgres_tienda_imagen` en estado `healthy`.
+- Puerto de pruebas `127.0.0.1:15433`; volumen `tienda-imagen-lab_pg_tienda_imagen_data`.
+- Recuentos iniciales `24/100/200/200`, iguales antes/después de `stop/start`.
+- El identificador del contenedor principal se mantuvo igual antes/después de la prueba.
+- Imagen adicional `postgresql-tienda:github` construida correctamente.
+
+3) INCIDENCIAS Y LIMITACIONES
+- Los resultados corresponden a una ejecución pasada y no acreditan la disponibilidad actual.
+- No ejecutar scripts de entrada sobre un volumen existente esperando reinicialización.
+
+4) ESTADO FINAL Y REVERSIÓN
+- El volumen sobrevivió a `down/up`; conservar `pg_tienda_imagen_data`. No ejecutar `down -v` ni `docker volume prune`.
+
+5) CONCLUSIÓN
+- Construcción, aislamiento, datos y persistencia: VALIDADOS.

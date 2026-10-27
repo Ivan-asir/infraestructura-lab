@@ -1,6 +1,6 @@
 # Guía de ejecución del laboratorio de Sistemas, Bases de Datos y Automatización
 
-> **Documento de ejecución.** Resume los pasos para reproducir las prácticas de este laboratorio.
+> Recorrido público de ejecución por bloques. Los comandos se aplican en el entorno indicado y se ejecutan una única vez cuando crean recursos. No incluye evidencias ni la documentación de las pruebas históricas.
 
 ## 1. Requisitos y recorrido
 
@@ -10,7 +10,7 @@ El laboratorio original utiliza **Rocky Linux 9.8** en **Oracle VirtualBox**, Po
 - Git, acceso al repositorio y conectividad SSH a la VM.
 - Para el recorrido de contenedores: Docker Desktop con integración WSL2, Docker Compose y espacio para las imágenes y volúmenes.
 - Ajustar direcciones IP y nombres de interfaces si el anfitrión utiliza una red diferente. Los valores de este documento corresponden a la red de ejemplo.
-- La inicialización, instalación y restauración se plantean para máquinas y bases de datos nuevas.
+- La inicialización, instalación y restauración se plantean para máquinas y bases de datos nuevas; una restauración PITR requiere una copia de la VM.
 
 Orden sugerido:
 
@@ -20,11 +20,10 @@ Orden sugerido:
 4. Configurar el backup lógico y probar una restauración aislada.
 5. Realizar WAL/PITR **solo en una VM aislada, con punto de retorno verificado**.
 6. En otro entorno, iniciar Docker Compose y probar la imagen propia.
-7. Validar el repositorio y consultar los resultados de GitHub Actions.
+7. Desplegar Jenkins con un agente SSH y su pipeline.
+8. Crear el clúster Kubernetes y desplegar la aplicación Nginx.
 
-Los documentos `docs/network.md`, `docs/rocky-baseline.md`, `postgresql/01-installation/README.md`, `postgresql/02-sql-roles/README.md`, `postgresql/03-backups/README.md`, `postgresql/04-pitr/README.md` y `docs/docker-validation.md` contienen la configuración y los resultados registrados en el laboratorio original. Sus evidencias sirven de referencia, **no son salidas garantizadas en otro equipo**.
-
-Las evidencias `validation.txt` de cada capítulo utilizan la [misma estructura](formato-validaciones.md): contexto, resultados, incidencias, estado final/reversión y conclusión. No se deben publicar salidas de ejemplo como evidencias reales.
+Los archivos de cada módulo describen las dependencias y límites de la práctica. Este recorrido facilita los comandos y no exige generar informes de validación.
 
 ## 2. Descargar el repositorio
 
@@ -33,10 +32,7 @@ Las evidencias `validation.txt` de cada capítulo utilizan la [misma estructura]
 ```bash
 git clone https://github.com/Ivan-asir/infraestructura-lab.git
 cd infraestructura-lab
-bash scripts/validate-repository.sh
 ```
-
-El validador requiere un repositorio Git (`.git`): si se descarga un ZIP, la verificación basada en Git no podrá funcionar sin inicializar un repositorio. No usar `git add .` ni publicar datos privados.
 
 ## 3. Crear la VM, red y acceso SSH
 
@@ -149,7 +145,7 @@ sudo -u postgres psql -v ON_ERROR_STOP=1 -d tienda < postgresql/02-sql-roles/rol
 sudo -u postgres psql -v ON_ERROR_STOP=1 -d tienda < postgresql/sql/exercises.sql
 ```
 
-Los roles `tienda_readonly` y `tienda_readwrite` son `NOLOGIN`: se prueban desde una sesión administrativa con `SET ROLE`, no con conexiones directas. Para comprobaciones de permisos y resultados, consultar `postgresql/sql/exercises.md`, `postgresql/02-sql-roles/README.md` y `postgresql/02-sql-roles/validation.txt`. Las pruebas DML deben revertirse con `ROLLBACK` para mantener la carga original.
+Los roles `tienda_readonly` y `tienda_readwrite` son `NOLOGIN`: se prueban desde una sesión administrativa con `SET ROLE`, no con conexiones directas. Para comprobaciones de permisos y resultados, consultar `postgresql/sql/exercises.md` y `postgresql/02-sql-roles/README.md`. Las pruebas DML deben revertirse con `ROLLBACK` para mantener la carga original.
 
 ## 7. Backup lógico y restauración (VM Rocky Linux)
 
@@ -251,7 +247,7 @@ ORDER BY id;
 ROLLBACK;
 ```
 
-Finalmente salir con `\q`. La consulta muestra **solo las diferencias**: si devuelve cero filas, los datos comprobados coinciden, pero eso no demuestra que haya existido una corrupción real. `ROLLBACK` elimina la tabla temporal de esta transacción y descarta cualquier modificación no confirmada. La evidencia resumida está en `postgresql/03-backups/validation.txt`.
+Finalmente salir con `\q`. La consulta muestra **solo las diferencias**: si devuelve cero filas, los datos comprobados coinciden, pero eso no demuestra que haya existido una corrupción real. `ROLLBACK` elimina la tabla temporal de esta transacción y descarta cualquier modificación no confirmada.
 
 Rollback de la instalación del temporizador, si fuera necesario (no elimina los dumps):
 
@@ -259,7 +255,7 @@ Rollback de la instalación del temporizador, si fuera necesario (no elimina los
 sudo systemctl disable --now pg-lab-backup.timer
 ```
 
-Consultar `postgresql/03-backups/README.md` para objetivos y `postgresql/03-backups/validation.txt` para los resultados registrados.
+Para conocer las particularidades del servicio y las opciones de recuperación, consultar `postgresql/03-backups/README.md`.
 
 ## 8. WAL, copia base y recuperación PITR (VM Rocky Linux)
 
@@ -283,11 +279,11 @@ docker version
 docker compose version
 ```
 
-Crear **localmente** `docker/.env` (el repositorio lo excluye de Git). El siguiente valor es un **marcador, no una contraseña utilizable**; sustituirlo por una contraseña propia con el editor, sin publicarla ni escribir el secreto en el historial de comandos:
+Crear **localmente** `docker/.env` (ignorado por Git). El ejemplo incluye `POSTGRES_DB=tienda` y `POSTGRES_USER=postgres`; sustituir la contraseña de muestra mediante el editor, sin publicarla:
 
 ```bash
 umask 077
-printf 'POSTGRES_PASSWORD=CAMBIAR_ESTA_CONTRASENA\n' > docker/.env
+test ! -e docker/.env && cp docker/.env.example docker/.env
 vi docker/.env
 chmod 600 docker/.env
 ```
@@ -320,7 +316,7 @@ docker compose --env-file ../.env -f docker-compose.yml up -d --no-build
 docker exec db_postgres_tienda_imagen psql -U postgres -d tienda -c 'SELECT count(*) FROM productos;'
 ```
 
-En estos comandos se parte de `docker/` después de iniciar el Compose principal; si se abre otra terminal, ir explícitamente a `docker/image/`. El volumen y los puertos son **distintos** a los del Compose principal. Evidencias: `docs/docker-validation.md` y `docs/docker-image-validation.md`.
+En estos comandos se parte de `docker/` después de iniciar el Compose principal; si se abre otra terminal, ir explícitamente a `docker/image/`. El volumen y los puertos son **distintos** a los del Compose principal. Detalles de cada Compose: `docker/README.md` y `docker/image/README.md`.
 
 ## 10. GitHub Actions y publicación
 
@@ -342,17 +338,301 @@ git diff --cached
 
 Publicar únicamente archivos revisados. **No incluir:** `docker/.env`, claves privadas, dumps, directorios de datos, WAL, snapshots ni CSV con datos sensibles. La guía de flujo Git es `docs/repository-workflow.md`.
 
-## 11. Comprobaciones finales y limitaciones
+## 11. Jenkins — controlador, agente SSH y PostgreSQL CI (Ubuntu/WSL2)
 
-Los bloques 01 a 04 se consideran completados cuando:
+**Entorno:** terminal Ubuntu/WSL2; directorio raíz del repositorio. Jenkins es un proyecto Compose independiente; no reutiliza la base `tienda` del sistema Rocky ni el volumen del Compose de Docker.
 
-- PostgreSQL nativo está instalado y operativo en `pg-primary`.
-- La base de datos `tienda` contiene los recuentos esperados.
-- Los roles y permisos funcionan según lo documentado.
-- El backup lógico se ha restaurado correctamente en bases auxiliares.
-- El archivado WAL y la recuperación PITR han sido validados.
-- El retorno al `PGDATA` original se ha comprobado sin pérdida de los datos principales del laboratorio.
+El archivo `jenkins/.env.example` define las variables necesarias, pero sus contraseñas y la clave pública de acceso deben sustituirse localmente. Antes de generar una clave nueva, comprobar si ya existe una identidad destinada a este agente para evitar sobrescribirla. **No publicar la clave privada ni `.env`.**
 
-Los contenidos relativos a Docker Compose y GitHub Actions se validan por separado mediante sus propias evidencias y ejecuciones de CI.
+```bash
+cd "$(git rev-parse --show-toplevel)"
+mkdir -p "$HOME/.ssh"
+test ! -e "$HOME/.ssh/infraestructura-lab-jenkins-agent" && ssh-keygen -t ed25519 -f "$HOME/.ssh/infraestructura-lab-jenkins-agent" -C "jenkins-agent"
+cat "$HOME/.ssh/infraestructura-lab-jenkins-agent.pub"
+```
 
-**Referencias:** [PostgreSQL 18](https://www.postgresql.org/docs/18/), [Rocky Linux](https://docs.rockylinux.org/), [Docker Compose](https://docs.docker.com/compose/), [systemd.timer](https://www.freedesktop.org/software/systemd/man/latest/systemd.timer.html).
+Copiar la clave **pública** completa al campo `JENKINS_AGENT_SSH_PUBKEY` del archivo privado `jenkins/.env`, y establecer dos contraseñas locales diferentes para `POSTGRES_PASSWORD` y `CI_PASSWORD`:
+
+```bash
+test ! -e jenkins/.env && cp jenkins/.env.example jenkins/.env
+chmod 600 jenkins/.env
+vi jenkins/.env
+cd jenkins
+docker compose config --quiet
+docker compose build jenkins_agent
+docker compose up -d
+```
+
+Abrir `http://127.0.0.1:18080` desde el anfitrión. Completar el asistente inicial de Jenkins y crear una cuenta administrativa local. Para un controlador recién creado, la contraseña inicial se obtiene localmente, sin publicarla:
+
+```bash
+docker exec jenkins_controller cat /var/jenkins_home/secrets/initialAdminPassword
+```
+
+Desde **Manage Jenkins → Credentials**, añadir la clave **privada del cliente** como credencial SSH del nodo (nunca subirla a Git). Desde **Manage Jenkins → Nodes**, crear `jenkins_agent` con 1 ejecutor y etiqueta `jenkins-lab`, acceso SSH al host Docker `jenkins_agent` puerto `22`. Para la verificación manual de identidad del servidor, obtener la clave pública de host una vez que el volumen `jenkins_agent_ssh_host` ya está montado:
+
+```bash
+docker compose exec -T jenkins_agent cat /etc/ssh/ssh_host_ed25519_key.pub
+```
+
+Configurarla en la estrategia **Manually provided key Verification Strategy** del nodo. Crear un job **Pipeline** cuyo código proceda del repositorio público Git, con ruta de script `jenkins/Jenkinsfile`. Las fases se ejecutan sobre el agente con etiqueta `jenkins-lab`.
+
+## 12. Kubernetes — `kind`, `kubectl` y aplicación web (Ubuntu/WSL2)
+
+**Entorno:** terminal Ubuntu/WSL2 con Docker Desktop e integración WSL2 habilitada; usuario ordinario con acceso a Docker. `sudo` se utiliza únicamente para instalar ejecutables en `/usr/local/bin`. La aplicación utiliza un clúster local, no un servicio cloud.
+
+Este bloque se divide en tres ejercicios. **K1, K2 y K3 son identificadores de prácticas de este repositorio; no son componentes ni comandos propios de Kubernetes.**
+
+| Ejercicio | Qué se realiza | Qué se aprende |
+|---|---|---|
+| **K1 — Crear el clúster local** | Instalar `kind`, crear el clúster e instalar `kubectl`. | Nodos, plano de control, contexto y API de Kubernetes. |
+| **K2 — Desplegar una aplicación** | Aplicar los manifiestos de Nginx y acceder mediante un Service. | Namespace, ConfigMap, Deployment, Pods, Service y sondas de salud. |
+| **K3 — Incidencia y recuperación** | Introducir opcionalmente un fallo controlado de readiness y revertir la revisión. | Diagnóstico, reconciliación, historial y `rollout undo`. |
+
+### 12.1. Requisitos previos e instalación de `kind`
+
+**Consulta previa en Ubuntu/WSL2:**
+
+```bash
+docker version
+docker info --format '{{.ServerVersion}}'
+uname -m
+command -v kind || true
+kind version 2>/dev/null || true
+command -v kubectl || true
+kubectl version --client 2>/dev/null || true
+```
+
+Docker debe responder y la arquitectura de referencia es `x86_64` (`amd64`). Si `kind` ya está instalado, **conservarlo y continuar con 12.2**; no sobrescribir su ejecutable. En otra arquitectura, usar el binario correspondiente de la [distribución oficial de kind](https://kind.sigs.k8s.io/docs/user/quick-start/).
+
+**Solo si `kind` no existe**, preparar las herramientas de descarga que falten:
+
+```bash
+sudo apt-get update
+sudo apt-get install -y ca-certificates curl
+```
+
+Descargar la versión de referencia `v0.33.0` de `kind` y su suma de comprobación en un directorio de caché **fuera del repositorio** (instrucciones para `x86_64`):
+
+```bash
+mkdir -p "$HOME/.cache/infraestructura-lab/kubernetes"
+cd "$HOME/.cache/infraestructura-lab/kubernetes"
+curl -fL --retry 3 -o kind-linux-amd64 \
+  https://kind.sigs.k8s.io/dl/v0.33.0/kind-linux-amd64
+curl -fL --retry 3 -o kind-linux-amd64.sha256sum \
+  https://github.com/kubernetes-sigs/kind/releases/download/v0.33.0/kind-linux-amd64.sha256sum
+sha256sum --check kind-linux-amd64.sha256sum
+```
+
+Continuar **únicamente si** la comprobación devuelve `kind-linux-amd64: OK`. Antes de instalar, comprobar que no se va a reemplazar un ejecutable existente:
+
+```bash
+command -v kind || true
+ls -l /usr/local/bin/kind 2>/dev/null || true
+```
+
+Si no existe un `kind` instalado y el checksum es correcto:
+
+```bash
+sudo install -o root -g root -m 0755 kind-linux-amd64 /usr/local/bin/kind
+kind version
+```
+
+### 12.2. K1 — Crear o reutilizar el clúster local
+
+Antes de crear el clúster, comprobar los recursos Docker y los clústeres existentes:
+
+```bash
+docker ps --format 'table {{.Names}}\t{{.Status}}\t{{.Ports}}'
+kind get clusters
+```
+
+Si aparece `infraestructura-lab-kubernetes`, **no volver a crearlo**; pasar a la instalación o comprobación de `kubectl`. La creación consume recursos de Docker Desktop, por lo que conviene no mantener simultáneamente otros entornos pesados sin comprobar la memoria disponible.
+
+La API se publica en `127.0.0.1:34567`. Este puerto resolvió un conflicto previo con un intervalo reservado en Windows. **En PowerShell de Windows** y solo para una instalación nueva, comprobarlo antes de crear el clúster:
+
+```powershell
+Get-NetTCPConnection -LocalPort 34567 -ErrorAction SilentlyContinue
+netsh interface ipv4 show excludedportrange protocol=tcp
+```
+
+Si el puerto está ocupado o reservado, elegir otro puerto libre comprobado y actualizar `apiServerPort` en el archivo de configuración *antes de crear* el clúster. No eliminar reservas de Windows ni exponer la API en todas las interfaces.
+
+**En Ubuntu/WSL2**, consultar si existe una configuración previa:
+
+```bash
+mkdir -p "$HOME/.cache/infraestructura-lab/kubernetes"
+ls -l "$HOME/.cache/infraestructura-lab/kubernetes/kind-config.yaml" 2>/dev/null || true
+```
+
+Si **no existe**, crear el archivo local `~/.cache/infraestructura-lab/kubernetes/kind-config.yaml`:
+
+```bash
+cat > "$HOME/.cache/infraestructura-lab/kubernetes/kind-config.yaml" <<'YAML'
+kind: Cluster
+apiVersion: kind.x-k8s.io/v1alpha4
+networking:
+  apiServerAddress: "127.0.0.1"
+  apiServerPort: 34567
+nodes:
+  - role: control-plane
+YAML
+```
+
+Si el archivo ya existía, inspeccionar su contenido y **no ejecutar el bloque de escritura anterior**. Crear el clúster **una sola vez**, si el nombre no figura en `kind get clusters`:
+
+```bash
+kind create cluster \
+  --name infraestructura-lab-kubernetes \
+  --config "$HOME/.cache/infraestructura-lab/kubernetes/kind-config.yaml" \
+  --wait 180s
+```
+
+Esto crea un nodo Docker con el plano de control y configura el contexto `kind-infraestructura-lab-kubernetes`. Comprobar la publicación de la API:
+
+```bash
+kind get clusters
+docker port infraestructura-lab-kubernetes-control-plane 6443/tcp
+```
+
+### 12.3. Instalar y comprobar `kubectl`
+
+`kubectl` es el cliente que se comunica con la API del clúster. **Si ya está instalado y su versión es compatible, mantenerlo**. Comprueba la instalación existente y la versión del nodo:
+
+```bash
+kubectl version --client 2>/dev/null || true
+docker exec infraestructura-lab-kubernetes-control-plane kubelet --version
+```
+
+La versión menor de `kubectl` debe estar dentro de una versión menor de diferencia respecto al plano de control. Si falta el cliente, descargaremos **la versión del nodo recién creado**, en lugar de elegir sin comprobar la versión estable más reciente.
+
+Solo si `kubectl` no está instalado, ejecutar en Ubuntu/WSL2 (`x86_64`):
+
+```bash
+KUBE_VERSION="$(docker exec infraestructura-lab-kubernetes-control-plane kubelet --version | awk '{print $2}')"
+printf 'Versión Kubernetes del nodo: %s\n' "$KUBE_VERSION"
+printf '%s\n' "$KUBE_VERSION" | grep -Eq '^v[0-9]+\.[0-9]+\.[0-9]+$'
+```
+
+La última orden debe terminar sin error. Si la versión está vacía o tiene un formato inesperado, **no continuar**. Descargar el binario y el checksum de **esa misma versión**:
+
+```bash
+cd "$HOME/.cache/infraestructura-lab/kubernetes"
+curl -fL --retry 3 -o kubectl \
+  "https://dl.k8s.io/release/${KUBE_VERSION}/bin/linux/amd64/kubectl"
+curl -fL --retry 3 -o kubectl.sha256 \
+  "https://dl.k8s.io/release/${KUBE_VERSION}/bin/linux/amd64/kubectl.sha256"
+printf '%s  kubectl\n' "$(cat kubectl.sha256)" | sha256sum --check
+```
+
+Continuar únicamente si devuelve `kubectl: OK`. Comprobar que el destino de instalación no existe:
+
+```bash
+command -v kubectl || true
+ls -l /usr/local/bin/kubectl 2>/dev/null || true
+```
+
+Si el binario no estaba instalado y la comprobación SHA-256 es correcta:
+
+```bash
+sudo install -o root -g root -m 0755 kubectl /usr/local/bin/kubectl
+kubectl version --client
+```
+
+Comprobar el acceso al clúster sin cambiar el contexto global:
+
+```bash
+kubectl config get-contexts
+kubectl --context kind-infraestructura-lab-kubernetes cluster-info
+kubectl --context kind-infraestructura-lab-kubernetes get nodes -o wide
+```
+
+Si el contexto no aparece o el nodo no está `Ready`, resolver primero ese problema antes de desplegar recursos. Procedimiento oficial: [instalar `kubectl` en Linux](https://kubernetes.io/docs/tasks/tools/install-kubectl-linux/).
+
+### 12.4. K2 — Desplegar y acceder a la aplicación
+
+Desde la raíz del repositorio, aplicar `kubernetes/web-lab.yml`. El manifiesto declara Namespace, ConfigMap, Deployment de dos réplicas y Service `ClusterIP`:
+
+```bash
+cd "$(git rev-parse --show-toplevel)"
+kubectl --context kind-infraestructura-lab-kubernetes apply -f kubernetes/web-lab.yml
+```
+
+Consultar el despliegue y esperar a que termine:
+
+```bash
+kubectl --context kind-infraestructura-lab-kubernetes -n web-lab \
+  rollout status deployment/web-lab --timeout=180s
+kubectl --context kind-infraestructura-lab-kubernetes -n web-lab \
+  get deployments,services,pods -o wide
+```
+
+En **una terminal de Ubuntu/WSL2**, mantener abierto el acceso temporal al Service:
+
+```bash
+kubectl --context kind-infraestructura-lab-kubernetes -n web-lab \
+  port-forward svc/web-lab 18081:80 --address 127.0.0.1
+```
+
+En **otra terminal**, abrir la página mediante:
+
+```bash
+curl -i --max-time 10 http://127.0.0.1:18081/
+```
+
+También se puede abrir `http://127.0.0.1:18081/` en el navegador del equipo. Un `HTTP 200` y la página del laboratorio indican que el Service permite acceder a la aplicación. Para detener únicamente el `port-forward`, pulsar `Ctrl+C` en la primera terminal.
+
+### 12.5. K3 — Incidencia controlada y recuperación (opcional)
+
+**Esta práctica modifica temporalmente el Deployment y puede afectar a sus nuevas réplicas. Ejecutarla solo en un clúster de laboratorio**, nunca sobre una aplicación ajena o de producción. El procedimiento siguiente sirve para reproducir el concepto de K3: no representa una transcripción de los comandos ejecutados históricamente en este repositorio.
+
+Primero comprobar el estado sano y la ruta de readiness actual:
+
+```bash
+kubectl --context kind-infraestructura-lab-kubernetes -n web-lab get deployment,pods
+kubectl --context kind-infraestructura-lab-kubernetes -n web-lab \
+  get deployment web-lab -o jsonpath='{.spec.template.spec.containers[0].readinessProbe.httpGet.path}{"\n"}'
+kubectl --context kind-infraestructura-lab-kubernetes -n web-lab rollout history deployment/web-lab
+```
+
+**Continuar solo si hay dos réplicas disponibles y la ruta de readiness es `/`.** Inyectar una ruta inexistente para provocar una nueva revisión con Pods no listos:
+
+```bash
+kubectl --context kind-infraestructura-lab-kubernetes -n web-lab \
+  patch deployment web-lab --type=json \
+  -p='[{"op":"replace","path":"/spec/template/spec/containers/0/readinessProbe/httpGet/path","value":"/ruta-inexistente-k3"}]'
+```
+
+Examinar el comportamiento sin repetir el cambio:
+
+```bash
+kubectl --context kind-infraestructura-lab-kubernetes -n web-lab \
+  rollout status deployment/web-lab --timeout=35s
+kubectl --context kind-infraestructura-lab-kubernetes -n web-lab \
+  get deployments,replicasets,pods
+kubectl --context kind-infraestructura-lab-kubernetes -n web-lab \
+  describe deployment/web-lab
+```
+
+Que `rollout status` termine por tiempo de espera es **esperable** en este ejercicio. Algunas réplicas anteriores pueden continuar sirviendo la aplicación mientras las nuevas no superan la readiness probe.
+
+**Reversión:** restaurar la revisión anterior del Deployment:
+
+```bash
+kubectl --context kind-infraestructura-lab-kubernetes -n web-lab \
+  rollout undo deployment/web-lab
+kubectl --context kind-infraestructura-lab-kubernetes -n web-lab \
+  rollout status deployment/web-lab --timeout=180s
+kubectl --context kind-infraestructura-lab-kubernetes -n web-lab \
+  get deployment,pods
+kubectl --context kind-infraestructura-lab-kubernetes -n web-lab \
+  get deployment web-lab -o jsonpath='{.spec.template.spec.containers[0].readinessProbe.httpGet.path}{"\n"}'
+```
+
+La ruta de readiness debe volver a `/` y las dos réplicas deben recuperarse. `rollout undo` revierte la **plantilla del Deployment**, no datos externos ni ConfigMaps. Si falla la recuperación, no borrar recursos: conservar `describe` y los eventos para investigar. No eliminar el clúster ni reiniciar Docker Desktop como parte del ejercicio.
+
+## 13. Cierre de una sesión de laboratorio
+
+Los datos de PostgreSQL y Jenkins viven en volúmenes; detener un contenedor no los elimina. Cuando se termine una sesión, se pueden parar los servicios que se estén usando con `docker compose stop` desde el directorio del proyecto correspondiente. **No utilizar** `docker compose down -v`, `docker volume prune` ni `kind delete cluster` como parte de una parada rutinaria.
+
+Para profundizar en una práctica, consultar el README del directorio correspondiente. Este documento es únicamente un recorrido operativo de reproducción.

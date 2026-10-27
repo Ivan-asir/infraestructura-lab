@@ -1,4 +1,4 @@
-name: infraestructura-lab-docker
+name: infraestructura-lab-docker-postgresql
 
 services:
   db_postgres_tienda:
@@ -10,7 +10,7 @@ services:
     ports:
       - "127.0.0.1:15432:5432"
     volumes:
-      - pg_lab_data:/var/lib/postgresql
+      - tienda_data:/var/lib/postgresql
       - ../postgresql/sql/schema.sql:/docker-entrypoint-initdb.d/01-schema.sql:ro
       - ../postgresql/sql/seed.sql:/docker-entrypoint-initdb.d/02-seed.sql:ro
     healthcheck:
@@ -20,4 +20,4 @@ services:
       retries: 12
 
 volumes:
-  pg_lab_data:
+  tienda_data:

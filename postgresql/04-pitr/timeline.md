@@ -12,7 +12,7 @@
 |---:|---|---|
 | 1 | Fin de `pg_basebackup` | Consultar logs de la ejecución o notas originales |
 | 2 | `INSERT` y `COMMIT` en `pitr_marker` | Consultar historia SQL o registro fiable |
-| 3 | Instante objetivo PITR | `2026-10-23 08:55:25.354183+00` | `postgresql/04-pitr/README.md` |
+| 3 | Instante objetivo PITR | `2026-10-23 08:55:25.354183+00`; fuente: configuración de la ejecución documentada en `configuration.md` |
 | 4 | `DROP TABLE public.pitr_marker` | Consultar logs y transcripción original |
 | 5 | `pg_switch_wal()` / archivado | Consultar evidencia original de WAL |
 | 6 | Pausa de recuperación | `validation.txt`: `paused` e `pg_is_in_recovery()=t` |

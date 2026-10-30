@@ -29,6 +29,17 @@ Desde `jenkins/`, verificar `docker compose config --quiet`, los contenedores ex
 El proyecto Compose `infraestructura-lab-jenkins` ejecuta `jenkins_controller`,
 `jenkins_agent` y `jenkins_postgres_ci` dentro de la red `ci`.
 
+### Variables por servicio
+
+El agente recibe únicamente `JENKINS_AGENT_SSH_PUBKEY`. PostgreSQL CI recibe
+`POSTGRES_USER`, `POSTGRES_PASSWORD` y `CI_PASSWORD`. El archivo `.env` privado
+sirve para interpolar esos valores; no se inyecta completo en los contenedores.
+No publicar su contenido ni la salida de `docker compose config` sin `--quiet`.
+
+El pipeline base descarga el repositorio y ejecuta validaciones estáticas.
+PostgreSQL CI es una instancia independiente; el Jenkinsfile base no ejecuta
+pruebas SQL ni despliega la aplicación Kubernetes.
+
 ### Identidad SSH del agente
 
 El servicio `jenkins_agent` monta el volumen Docker con nombre
@@ -47,7 +58,7 @@ Strategy → Manually provided key Verification Strategy**.
 
 ## 6. Comprobaciones y criterios de aceptación
 
-Los criterios siguientes se contrastaron con los resultados registrados en `validation.txt`.
+La evidencia existente identifica el commit y build probados. Tras modificar el Compose, comprobar de nuevo el agente ONLINE, la misma huella SSH y un pipeline correcto. Registrar esa ejecución por separado.
 
 ### Comprobaciones sin cambios
 
@@ -63,6 +74,15 @@ docker compose exec -T jenkins_agent \
 docker compose exec -T jenkins_agent \
   cat /etc/ssh/ssh_host_ed25519_key.pub
 ```
+
+Con el agente arrancado, comprobar que no recibe las contraseñas SQL sin imprimir el entorno ni sus valores:
+
+```bash
+docker compose exec -T jenkins_agent sh -c \
+  'test -z "${POSTGRES_PASSWORD+x}" && test -z "${CI_PASSWORD+x}"'
+```
+
+Código de salida esperado: `0`. La comprobación no sustituye la verificación del nodo ni la ejecución del pipeline.
 
 Para **probar** la persistencia, anotar la huella, confirmar que no hay builds en
 curso y, durante una ventana de mantenimiento, recrear únicamente el agente:
@@ -87,5 +107,6 @@ No publicar `.env`, credenciales, claves privadas ni contenido de volúmenes. Co
 
 ## 10. Estado y evidencias
 
-- **Estado:** VALIDADO; agente `ONLINE`, huella SSH persistente y pipeline `SUCCESS` (build `#2`).
+- **Ejecución conservada:** agente `ONLINE`, huella SSH persistente y pipeline `SUCCESS` en build `#2`.
+- **Configuración con variables limitadas por servicio:** VALIDADA. Compose correcto, PostgreSQL CI `healthy`, contraseñas SQL ausentes del agente y huella SSH conservada tras recreación.
 - **Evidencia:** `validation.txt`; incidencia de identidad SSH en `troubleshooting.md`.

@@ -1,5 +1,10 @@
 # Validación de la imagen PostgreSQL personalizada con Docker Compose
 
+> **Alcance de este registro:** los nombres `tienda-imagen-lab` y
+> `tienda-imagen-lab_pg_tienda_imagen_data` corresponden a la ejecución
+> documentada. La configuración vigente usa el proyecto
+> `infraestructura-lab-docker-postgresql-imagen` y la clave `tienda_imagen`.
+
 ## 1) Objetivo y alcance
 
 Construir una imagen propia de PostgreSQL 18 que incorpore los scripts `postgresql/sql/schema.sql` y `postgresql/sql/seed.sql`, desplegarla mediante `docker/image/docker-compose.yml` y demostrar que funciona sin sustituir el contenedor principal `db_postgres_tienda`.
@@ -68,9 +73,9 @@ La imagen contiene **scripts de inicialización**, no una base de datos ya carga
 | Estado actual del contenedor principal | running |
 | Comparación de identificadores antes/después | Identificadores coincidentes |
 
-### 6.2) Prueba controlada de `stop/start`
+### 6.2) Prueba controlada de `down/up`
 
-| Evidencia | Antes de `stop` | Después de `start` |
+| Evidencia | Antes de `down` | Después de `up` |
 |---|---|---|
 | Recuentos `clientes\|productos\|pedidos\|pedido_items` | `24\|100\|200\|200` | `24\|100\|200\|200` |
 | Nombre del volumen asociado | `tienda-imagen-lab_pg_tienda_imagen_data` | `tienda-imagen-lab_pg_tienda_imagen_data` |
@@ -93,7 +98,7 @@ La imagen contiene **scripts de inicialización**, no una base de datos ya carga
 | Contenedor adicional | `db_postgres_tienda_imagen` |
 | Estado de salud | `healthy` |
 | Recuentos SQL | `24\|100\|200\|200` |
-| Persistencia tras stop/start | Comprobada según evidencias |
+| Persistencia tras down/up | Comprobada según evidencias |
 | Volumen utilizado | `tienda-imagen-lab_pg_tienda_imagen_data` |
 | Contenedor principal preservado | Identificadores antes/después coincidentes |
 | Construcción desde GitHub | Imagen creada correctamente |

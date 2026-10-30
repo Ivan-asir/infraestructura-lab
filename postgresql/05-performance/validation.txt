@@ -1,0 +1,54 @@
+VALIDACIÓN | 05 - RENDIMIENTO
+=============================
+
+1) CONTEXTO
+- Entorno verificado: pg-primary, PostgreSQL 18.6, postgresql.service activo,
+  PGDATA /var/lib/pgsql/data. Usuario Linux: labadmin; SQL mediante postgres.
+- Contexto previo a la serie: base perf_lab_bench, 200000 eventos, único índice inicial eventos_pkey.
+- Base de datos original perf_lab: 200000 eventos, 24 de usuario_id=1234, índices eventos_pkey e idx_eventos_usuario.
+- Alcance: índice simple (5 mediciones por fase) e índice compuesto (1 medición por fase), sobre la base de datos auxiliar perf_lab_bench.
+- Estado: VALIDADO para la base de datos perf_lab_bench.
+
+2) COMPROBACIONES Y RESULTADOS
+- Preparación de perf_lab_bench: createdb correcto; setup.sql produjo CREATE TABLE, INSERT 0 200000 y ANALYZE; recuento=200000.
+- Consulta SELECT * FROM public.eventos WHERE usuario_id=1234 (sin índice simple):
+    * Gather / Parallel Seq Scan, 27 filas reales.
+    * Execution Time de las 5 medidas sin índice (ms): 19.055, 18.723, 11.435, 19.602, 19.913; mediana=19.055 ms.
+    * CREATE INDEX idx_eventos_usuario y ANALYZE: correctos.
+- Consulta SELECT * FROM public.eventos WHERE usuario_id=1234 (con índice simple):
+    * Bitmap Heap Scan / Bitmap Index Scan, 27 filas reales.
+    * Execution Time de las 5 medidas (ms): 0.216, 0.180, 0.217, 0.156, 0.172; mediana=0.180 ms.
+    * Relación de medianas de esta sesión: 105.9 a 1; reducción=99.1 %.
+- Consulta por usuario y fecha, antes del índice compuesto:
+  GroupAggregate / Bitmap Heap Scan / Bitmap Index Scan sobre
+  idx_eventos_usuario; 27 filas localizadas, 23 descartadas por fecha;
+  4 cumplen el filtro; shared hit=29 (nodo superior);
+  Planning Time=1.641 ms; Execution Time=0.573 ms.
+- CREATE INDEX idx_eventos_usuario_fecha y ANALYZE: correctos.
+- Consulta por usuario y fecha, después del índice compuesto:
+  GroupAggregate / Index Only Scan sobre idx_eventos_usuario_fecha;
+  condición conjunta sobre usuario_id y fecha; 4 filas;
+  Heap Fetches=0; shared hit=1 read=3 (nodo superior);
+  Planning Time=0.821 ms; Execution Time=0.083 ms.
+- Comparación compuesta: tiempo aproximadamente 6.9 veces menor,
+  con una sola medición antes y una después.
+- Índices finales de perf_lab_bench comprobados: eventos_pkey,
+  idx_eventos_usuario e idx_eventos_usuario_fecha.
+- Planes históricos conservados en plan-before.txt y plan-after.txt.
+
+3) INCIDENCIAS Y LIMITACIONES
+- Los datos se generan aleatoriamente: perf_lab devolvió 24 filas para usuario_id=1234; perf_lab_bench devolvió 27. No son la misma carga.
+- Cinco ejecuciones por fase no acreditan rendimiento estable bajo carga; el índice compuesto solo tiene una medición por fase.
+- No sumar buffers de nodos padres e hijos como valores independientes.
+
+4) ESTADO FINAL Y REVERSIÓN
+- Base de datos original perf_lab: no modificada por la nueva serie de ensayos.
+- Base de datos auxiliar perf_lab_bench: 200000 filas, índices eventos_pkey, idx_eventos_usuario e idx_eventos_usuario_fecha comprobados al final.
+- No se eliminaron tablas, índices ni bases para repetir la comparación.
+- Reversión: NO EJECUTADA; base de datos auxiliar conservada.
+
+5) CONCLUSIÓN
+- Ejecución sobre base de datos auxiliar VALIDADA.
+- Índice compuesto validado con cambio a Index Only Scan.
+- Los resultados consolidados en este validation.txt.
+- Limitación: las mediciones son de laboratorio y no acreditan una mejora universal ni condiciones de carga controladas.

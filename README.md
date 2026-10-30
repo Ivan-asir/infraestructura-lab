@@ -19,6 +19,7 @@ numeran según su orden de ejecución:
 - `postgresql/02-sql-roles/`: SQL, roles y permisos.
 - `postgresql/03-backups/`: backup lógico y restauración.
 - `postgresql/04-pitr/`: archivado WAL y recuperación PITR.
+- `postgresql/05-performance/`: comparación de planes y rendimiento.
 - `postgresql/sql/`: esquema, datos y ejercicios SQL compartidos.
 
 El resto de tecnologías mantiene directorios independientes, por ejemplo:
@@ -56,7 +57,7 @@ no representa una numeración global de todas las tecnologías.
 | SQL, roles y permisos                       | `OK`    |
 | Backup y restore                            | `OK`    |
 | PITR                                        | `OK`    |
-| Rendimiento                                 | Pendiente |
+| Rendimiento                                 | `OK` |
 | Monitorización y troubleshooting           | Pendiente |
 | Replicación                                | Pendiente |
 | Docker Compose y CI                         | `OK`    |
@@ -65,12 +66,13 @@ no representa una numeración global de todas las tecnologías.
 | Oracle Database Free                        | Pendiente |
 | Kubernetes (creación de clúster `kind`) | `OK`    |
 | Kubernetes (Deployment y Service) | `OK` |
-| Kubernetes (K3: estado posterior) | Comprobado |
+| Kubernetes (K3: fallo de readiness y rollback) | `OK` |
 
 ## Reproducir las prácticas
 
 La [guía pública de ejecución](docs/guia-ejecucion.md) organiza los comandos por bloque y entorno.
 Los README de cada módulo detallan su configuración y las evidencias conservadas.
+El estado de las prácticas se resume en este README y las evidencias de cada apartado se conservan en sus respectivos `validation.txt`.
 
 ## Documentación técnica
 

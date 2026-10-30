@@ -5,8 +5,10 @@ services:
     image: postgres:18
     container_name: db_postgres_tienda
     restart: "no"
-    env_file:
-      - .env
+    environment:
+      POSTGRES_DB: tienda
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?Define POSTGRES_PASSWORD en docker/.env}
     ports:
       - "127.0.0.1:15432:5432"
     volumes:

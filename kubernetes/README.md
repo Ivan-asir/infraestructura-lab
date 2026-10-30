@@ -9,7 +9,7 @@ Crear un clúster local con `kind` y estudiar Deployment, Service, probes, escal
 - Ubuntu/WSL2 con Docker Desktop.
 - Clúster: `infraestructura-lab-kubernetes`.
 - Contexto: `kind-infraestructura-lab-kubernetes`.
-- API: `127.0.0.1:34567` (puerto fijo tras conflicto en `34077`).
+- API de referencia: `127.0.0.1:34567`; comprobar disponibilidad y exclusiones de Windows antes de crear el clúster.
 - Namespace de la aplicación: `web-lab`.
 
 ## 3. Estructura de archivos
@@ -25,7 +25,7 @@ Verificar Docker, `kind get clusters`, `kubectl config get-contexts` y la dispon
 
 ## 5. Procedimiento de ejecución
 
-Configuración local de `kind` utilizada:
+Configuración local de referencia para crear el clúster, solo si no existe:
 
 ```yaml
 kind: Cluster
@@ -43,13 +43,13 @@ Antes de cada `kubectl apply`, verificar explícitamente `--context kind-infraes
 
 - **K1:** clúster `infraestructura-lab-kubernetes` y nodo `Ready`; API publicada en `127.0.0.1:34567`.
 - **K2:** Deployment con `2/2` réplicas disponibles, dos Pods `Running` sin reinicios, Service `ClusterIP` y respuesta `HTTP 200 OK` por `port-forward`.
-- **K3:** el historial conserva las revisiones 2 y 3, la revisión 3 figura disponible y el servicio responde.
+- **K3:** capturar estado sano, fallo controlado, orden de reversión y estado recuperado. Un despliegue final sano no demuestra por sí solo que se haya ejecutado `rollout undo`.
 
 Los resultados obtenidos se detallan en `validation.txt`.
 
 ## 7. Incidencias y limitaciones
 
-El intento inicial con puerto aleatorio `34077` falló por una exclusión Windows que incluía `34018–34117`. El clúster se creó correctamente usando `34567`.
+Comprobar puertos ocupados y excluidos antes de crear el clúster. Si el puerto de referencia no está disponible, elegir otro verificado y ajustar `apiServerPort` antes de la creación. Los incidentes observados y sus resultados se conservan en `troubleshooting.md`.
 
 ## 8. Reversión y recuperación
 
@@ -63,6 +63,6 @@ Mantener la API en loopback; no publicar kubeconfig, tokens, certificados ni sec
 
 - **K1:** VALIDADO. El control-plane alcanzó `Ready` después de 16 segundos.
 - **K2:** VALIDADO. Deployment `2/2`, dos Pods `Running`/`Ready`, respuesta HTTP `200 OK` y `rollout status` correcto.
-- **K3:** el despliegue final en revisión 3 está operativo.
+- **K3:** VALIDADO. Fallo controlado de readiness HTTP `404`, recuperación mediante `rollout undo`, Deployment `2/2` y respuesta HTTP `200 OK` posterior.
 - **Evidencias:** `validation.txt`.
 - **Incidencias:** `troubleshooting.md`.

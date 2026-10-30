@@ -9,7 +9,9 @@ Instancia reproducible y separada de `pg-primary`.
 - Ubuntu en WSL2 con Docker Desktop, Docker Engine y Docker Compose.
 - Instancia de contenedor independiente del PostgreSQL nativo de `pg-primary`.
 - Archivos SQL compartidos: `../postgresql/sql/schema.sql` y `../postgresql/sql/seed.sql`.
-- Puerto local `127.0.0.1:15432` y volumen Compose `pg_lab_data`.
+- Proyecto Compose `infraestructura-lab-docker-postgresql`.
+- Puerto local `127.0.0.1:15432` y clave de volumen `tienda_data`.
+- Nombre Docker predeterminado: `infraestructura-lab-docker-postgresql_tienda_data`.
 
 ## 3. Estructura de archivos
 
@@ -28,17 +30,17 @@ Desde `docker/`, revisar el archivo `.env` local sin publicarlo, comprobar `dock
 Desde `docker/`, validar con `docker compose config --quiet`, iniciar con
 `docker compose up -d` y comprobar el servicio `db_postgres_tienda` y el contenedor `db_postgres_tienda` mediante `docker compose ps`.
 
-La instancia usa `../postgresql/sql/schema.sql`, `../postgresql/sql/seed.sql` y el volumen `pg_lab_data`. Al inicializar una base vacía debe haber 24 clientes, 100 productos, 200 pedidos y 200 líneas. Los SQL de inicialización **no se repiten** al arrancar un volumen ya utilizado.
+La instancia usa `../postgresql/sql/schema.sql`, `../postgresql/sql/seed.sql` y el volumen `tienda_data`. Al inicializar una base vacía debe haber 24 clientes, 100 productos, 200 pedidos y 200 líneas. Los SQL de inicialización no se repiten al arrancar un volumen ya utilizado.
 
-La prueba de persistencia usa `docker compose stop` y `docker compose start`.
+La prueba de persistencia se realizó mediante `docker compose down` y `docker compose up -d`, sin utilizar `down -v`. Se confirmó posteriormente la conservación del registro de prueba.
 
 No se publican `docker/.env`, claves ni el volumen.
 
-La construcción de una imagen propia (sin datos persistentes) se documenta en `docker/image/Dockerfile`; el despliegue se define en `docker/image/docker-compose.yml` mediante el proyecto independiente `tienda-imagen-lab`. La construcción y sus pruebas se registran en `docs/docker-image-validation.md`. Para el build se utiliza la raíz del repositorio como contexto y se excluyen secretos mediante `.dockerignore`.
+La construcción de la imagen propia se define en `image/Dockerfile`; el despliegue utiliza `image/docker-compose.yml` y el proyecto independiente `infraestructura-lab-docker-postgresql-imagen`. Consulta [su procedimiento](image/README.md) y [las evidencias](../docs/docker-image-validation.md). El contexto de construcción es la raíz del repositorio y `.dockerignore` excluye secretos.
 
 ## 6. Comprobaciones y criterios de aceptación
 
-El archivo `validation.txt` recoge la validación histórica del servicio: contenedor `healthy`, recuentos `24/100/200/200`, persistencia tras `stop/start` y dos workflows de CI correctos. El detalle está en `../docs/docker-validation.md`.
+La aceptación requiere servicio disponible, recuentos comprobados y persistencia ensayada. Los resultados existentes se conservan en `validation.txt` y `../docs/docker-validation.md`.
 
 ## 7. Incidencias y limitaciones
 
@@ -54,4 +56,5 @@ No publicar contraseñas, variables reales de `.env`, claves privadas, datos per
 
 ## 10. Estado y evidencias
 
-- **Estado de la práctica documentada:** VALIDADO (véase `validation.txt` y `../docs/docker-validation.md`).
+- **Evidencia existente:** despliegue, datos y CI registrados.
+- **Configuración vigente:** proyecto `infraestructura-lab-docker-postgresql`, volumen `tienda_data` y variables explícitas; su validación funcional se registra en una ejecución propia.

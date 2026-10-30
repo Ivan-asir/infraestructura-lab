@@ -19,6 +19,7 @@ cuando se hayan realizado y validado.
 - Privilegios y pruebas con transacciones.
 - Backup lógico y restauración completa y selectiva.
 - Archivado WAL, copia base y recuperación PITR.
+- Rendimiento: ejecución validada sobre perf_lab_bench, con mediciones repetidas e índice compuesto.
 
 ## Contenedores
 

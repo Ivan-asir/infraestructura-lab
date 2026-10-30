@@ -22,4 +22,5 @@ VALIDACIÓN | 07 - DOCKER COMPOSE
 - El servicio puede permanecer detenido sin invalidar las pruebas anteriores; conservar el volumen, sin `down -v`.
 
 5) CONCLUSIÓN
-- Despliegue, datos iniciales, persistencia y CI: VALIDADOS.
+- Despliegue, datos iniciales y CI: resultados conservados.
+- Persistencia: conservación del registro documentada.

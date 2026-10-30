@@ -47,3 +47,5 @@ jobs:
           test "$(psql -At -c 'SELECT count(*) FROM productos')" = "100"
           test "$(psql -At -c 'SELECT count(*) FROM pedidos')" = "200"
           test "$(psql -At -c 'SELECT count(*) FROM pedido_items')" = "200"
+      - name: Verificar invariantes y restricciones SQL
+        run: psql -X -v ON_ERROR_STOP=1 -f postgresql/sql/assertions.sql

@@ -11,7 +11,7 @@ Ubuntu/WSL2, Docker Desktop y Docker Compose. Asegurar recursos y puertos libres
 ## 3. Estructura de archivos
 
 - `Dockerfile`: imagen y copia de SQL.
-- `docker-compose.yml`: servicio `db_postgres_tienda_imagen`, proyecto `tienda-imagen-lab`.
+- `docker-compose.yml`: servicio `db_postgres_tienda_imagen`, proyecto `infraestructura-lab-docker-postgresql-imagen`.
 - `validation.txt`: resumen homogéneo de resultados de la práctica.
 - `../../docs/docker-image-validation.md`: evidencia ampliada.
 - `../../.dockerignore`: exclusión de secretos del contexto de construcción.
@@ -31,7 +31,7 @@ docker compose --env-file .env -f image/docker-compose.yml up -d
 docker compose --env-file .env -f image/docker-compose.yml ps
 ```
 
-Antes de arrancar, comprobar el puerto `127.0.0.1:15433` y el volumen `pg_tienda_imagen_data`. No ejecutar `down -v`; los comandos anteriores crean o inician recursos y no son de solo lectura.
+Antes de arrancar, comprobar el puerto `127.0.0.1:15433` y la clave de volumen `tienda_imagen` (nombre Docker predeterminado: `infraestructura-lab-docker-postgresql-imagen_tienda_imagen`). Los comandos anteriores ya cargan `docker/.env` mediante `--env-file .env` desde `docker/`. No ejecutar `down -v`; `build` y `up` crean o inician recursos.
 
 ## 6. Comprobaciones y criterios de aceptación
 
@@ -43,7 +43,7 @@ El entrypoint de PostgreSQL solo ejecuta SQL inicial cuando el directorio de dat
 
 ## 8. Reversión y recuperación
 
-Detener exclusivamente el proyecto `tienda-imagen-lab` preservando `pg_tienda_imagen_data`. No eliminar volúmenes ni imágenes compartidas durante esta práctica.
+Detener exclusivamente el proyecto `infraestructura-lab-docker-postgresql-imagen` preservando `tienda_imagen`. Desde `docker/`, utilizar `docker compose --env-file .env -f image/docker-compose.yml stop`. Conservar esos mismos argumentos al usar `start`, `ps` o `logs`. No eliminar volúmenes ni imágenes compartidas.
 
 ## 9. Seguridad
 
@@ -51,6 +51,7 @@ Excluir `.env`, claves, dumps y ficheros privados del contexto y del repositorio
 
 ## 10. Estado y evidencias
 
-- **Estado:** VALIDADO (imagen, despliegue, recuentos, persistencia e independencia del contenedor principal).
+- **Ejecución conservada:** pruebas con el proyecto `tienda-imagen-lab` y el volumen de aquella ejecución; ver los archivos de evidencia.
+- **Configuración vigente:** proyecto `infraestructura-lab-docker-postgresql-imagen` y volumen `tienda_imagen`.
 - Evidencia ampliada: `../../docs/docker-image-validation.md`.
 - Resumen estructurado: `validation.txt`.

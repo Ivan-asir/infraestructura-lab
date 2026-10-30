@@ -4,7 +4,7 @@
 
 ## 1. Requisitos y recorrido
 
-El laboratorio original utiliza **Rocky Linux 9.8** en **Oracle VirtualBox**, PostgreSQL **18.6** de AppStream, y un segundo entorno **Windows 11 + Ubuntu/WSL2 + Docker Desktop**. Son **dos instancias distintas** de PostgreSQL: la nativa en la VM y la del contenedor.
+El entorno de referencia combina **Rocky Linux 9 en VirtualBox** y **Windows 11 + Ubuntu/WSL2 + Docker Desktop**. PostgreSQL se instala en la VM y también se ejecuta en contenedores independientes. Comprueba la versión disponible y las rutas efectivas antes de instalar; las versiones registradas en las evidencias corresponden a cada ejecución.
 
 - VirtualBox con una VM Rocky Linux 9, usuario administrador con `sudo`, salida a Internet y una interfaz Host-only.
 - Git, acceso al repositorio y conectividad SSH a la VM.
@@ -193,25 +193,32 @@ DUMP="/var/lib/pgsql/backups/tienda_FECHA_HORA.dump"
 sudo -u postgres pg_restore --list "$DUMP"
 sudo -u postgres psql -l
 sudo -u postgres createdb tienda_restore
-sudo -u postgres pg_restore --no-owner --no-privileges -d tienda_restore "$DUMP"
+sudo -u postgres pg_restore --exit-on-error --no-owner --no-privileges -d tienda_restore "$DUMP"
 sudo -u postgres psql -d tienda_restore -c 'SELECT count(*) FROM public.clientes;'
 sudo -u postgres psql -d tienda_restore -c 'SELECT count(*) FROM public.pedidos;'
 ```
 
-La restauración va a `tienda_restore`, **nunca directamente a `tienda`**. `createdb` y `pg_restore` fallarán o necesitarán un procedimiento diferente si la base de datos ya existe o contiene objetos.
+La restauración va a `tienda_restore`, **nunca directamente a `tienda`**. Si el destino existe, detente antes de ejecutar `createdb`. Si la restauración falla, no continúes con las comprobaciones ni repitas la carga sobre el destino parcial: conserva el dump y diagnostica el fallo antes de preparar otro destino vacío.
 
-**Recuperación selectiva:** crear una segunda base de datos auxiliar vacía `tienda_tabla_rescate` (si no existe) y restaurar únicamente `productos` desde el mismo dump:
+**Recuperación selectiva:** comprueba que `tienda_tabla_rescate` no existe y crea esa base auxiliar. Restaura en ella el dump completo para incluir las dependencias; selecciona después únicamente los datos de `productos` para compararlos con el origen. Si la base ya existe, detente y conserva su contenido.
 
 ```bash
 sudo -u postgres createdb tienda_tabla_rescate
-sudo -u postgres pg_restore --no-owner --no-privileges -t productos -d tienda_tabla_rescate "$DUMP"
+sudo -u postgres pg_restore --exit-on-error --no-owner --no-privileges -d tienda_tabla_rescate "$DUMP"
 sudo -u postgres psql -d tienda_tabla_rescate -c 'SELECT count(*) FROM public.productos;'
 ```
 
-`-t productos` **no garantiza recuperar índices, clave primaria y otras dependencias**; verificar la definición con `\d public.productos` dentro de `psql` si se pretende usar la tabla fuera de la práctica. Para comparar datos con `tienda`, exportarlos desde la base de datos auxiliar a un CSV local y utilizar una tabla temporal dentro de una transacción:
+Filtrar la restauración con `-t productos` no incluye automáticamente todas las dependencias de la tabla. Por eso se utiliza una restauración auxiliar completa. Para comparar datos con `tienda`, exporta únicamente `public.productos` y utiliza una tabla temporal dentro de una transacción. Antes de exportar, comprueba que `/var/lib/pgsql/backups/productos_rescate.csv` no existe. Si ya existe, conserva el archivo y elige otro nombre, adaptándolo también en la importación. No repitas la exportación para sobrescribir una evidencia.
 
 ```bash
-sudo -u postgres psql -d tienda_tabla_rescate -c "\copy (SELECT id, nombre, precio FROM public.productos ORDER BY id) TO '/var/lib/pgsql/backups/productos_rescate.csv' WITH (FORMAT csv, HEADER true)"
+sudo -u postgres bash -c '
+set -euo pipefail
+umask 077
+set -o noclobber
+psql -X -v ON_ERROR_STOP=1 -d tienda_tabla_rescate \
+  -c "COPY (SELECT id, nombre, precio FROM public.productos ORDER BY id) TO STDOUT WITH (FORMAT csv, HEADER true)" \
+  > /var/lib/pgsql/backups/productos_rescate.csv
+'
 sudo -u postgres psql -d tienda
 ```
 
@@ -259,16 +266,16 @@ Para conocer las particularidades del servicio y las opciones de recuperación, 
 
 ## 8. WAL, copia base y recuperación PITR (VM Rocky Linux)
 
-**Práctica de riesgo alto:** cambia la configuración de PostgreSQL, necesita reiniciar el servicio, y durante la restauración **detiene el clúster físico completo**, no solo la base `tienda`. No repetir sobre la instancia actual sin identificar el estado previo, el directorio de datos y un snapshot o resguardo validado. Esta sección resume la práctica realizada. El archivo [`postgresql/04-pitr/README.md`](../postgresql/04-pitr/README.md) complementa la guía con el entorno, las fases de recuperación, las comprobaciones de seguridad y los criterios de validación. No constituye por sí solo un procedimiento ejecutable completo de restauración.
+**Práctica de riesgo alto:** modifica la configuración, requiere reinicios y durante la recuperación detiene el clúster físico completo. Antes de ejecutarla, identifica el servicio, PGDATA, copia base, WAL e instante objetivo y verifica un snapshot de retorno. Las fases siguientes son un resumen; prepara el procedimiento completo y el retorno antes de detener PostgreSQL. Consulta [`postgresql/04-pitr/README.md`](../postgresql/04-pitr/README.md) para los requisitos y las comprobaciones. Los resultados conservados se consultan por separado en `validation.txt` y `timeline.md`.
 
 1. **Diagnóstico:** consultar `SHOW wal_level`, `SHOW archive_mode`, `SHOW archive_command`, espacio libre y estadísticas de `pg_stat_archiver`.
 2. **Archivado:** preparar `/var/lib/pgsql/wal_archive`, configurar únicamente los parámetros faltantes y comprobar la llegada de un segmento **nuevo** con `pg_switch_wal()`.
-3. **Copia física:** crear `/var/lib/pgsql/backups/pitr-base` sin reutilizar un destino con datos. Verificar con `pg_verifybackup` cuando estén disponibles sus dependencias. En la ejecución documentada, la comprobación de archivos y checksums se realizó correctamente con `--no-parse-wal`; la verificación automática adicional de WAL no se completó.
+3. **Copia física:** crear `/var/lib/pgsql/backups/pitr-base` sin reutilizar un destino con datos. Verificar con `pg_verifybackup` y disponer de sus dependencias antes de continuar. `--no-parse-wal` solo comprueba archivos y checksums; no acredita la comprobación automática de WAL.
 4. **Punto objetivo:** insertar una fila sintética en `public.pitr_marker`, registrar `clock_timestamp()` **después de confirmar el INSERT** y efectuar `DROP TABLE` más tarde. Verificar los WAL disponibles antes de continuar.
 5. **Recuperación:** solo después de respaldar el estado original, detener PostgreSQL, colocar la copia base en el directorio de datos y configurar `restore_command`, `recovery_target_time` y `recovery.signal`.
 6. **Pausa y diagnóstico:** comprobar `pg_is_in_recovery()`, `pg_get_wal_replay_pause_state()` y los logs reales de PostgreSQL. **No exigir que `TABLE pitr_marker` responda durante la pausa:** un `AccessExclusiveLock` reproducido desde WAL puede impedir la lectura.
 7. **Finalización controlada:** si los logs confirman el objetivo correcto y existe un retorno viable, ejecutar `pg_wal_replay_resume()`, comprobar que `pg_is_in_recovery()` devuelve `f` y **solo entonces** consultar el registro recuperado.
-8. **Retorno:** conservar la evidencia del clúster recuperado y devolver el PGDATA original previamente resguardado mediante un intercambio controlado de directorios, con PostgreSQL detenido. Validar después el servicio, las bases de datos y la ausencia de `pitr_marker`. El snapshot de VirtualBox queda como alternativa de reversión, previa comprobación de su estado y de los cambios que podrían perderse.
+8. **Retorno:** conservar las evidencias fuera de la VM, apagarla correctamente y restaurar el snapshot previamente verificado. Comprobar servicio, PGDATA, estado de recuperación y datos esperados en ese punto. La restauración descarta cambios posteriores al snapshot. La evidencia existente de un retorno por intercambio de PGDATA documenta otro método; no acredita la restauración del snapshot y no debe reescribirse como si lo hiciera.
 
 ## 9. Docker Compose y construcción de imagen propia (Ubuntu/WSL2)
 
@@ -279,7 +286,7 @@ docker version
 docker compose version
 ```
 
-Crear **localmente** `docker/.env` (ignorado por Git). El ejemplo incluye `POSTGRES_DB=tienda` y `POSTGRES_USER=postgres`; sustituir la contraseña de muestra mediante el editor, sin publicarla:
+Crear **localmente** `docker/.env` (ignorado por Git) a partir de `.env.example`. Sustituye el marcador de `POSTGRES_PASSWORD` por una contraseña local. Los Compose fijan `POSTGRES_DB=tienda` y `POSTGRES_USER=postgres`; la contraseña se carga desde el archivo privado y no se publica:
 
 ```bash
 umask 077
@@ -449,7 +456,7 @@ kind get clusters
 
 Si aparece `infraestructura-lab-kubernetes`, **no volver a crearlo**; pasar a la instalación o comprobación de `kubectl`. La creación consume recursos de Docker Desktop, por lo que conviene no mantener simultáneamente otros entornos pesados sin comprobar la memoria disponible.
 
-La API se publica en `127.0.0.1:34567`. Este puerto resolvió un conflicto previo con un intervalo reservado en Windows. **En PowerShell de Windows** y solo para una instalación nueva, comprobarlo antes de crear el clúster:
+La API se publica en `127.0.0.1:34567`. Antes de crear un clúster, comprueba que el puerto esté libre y fuera de los intervalos excluidos de Windows. Ejecuta estas consultas en PowerShell:
 
 ```powershell
 Get-NetTCPConnection -LocalPort 34567 -ErrorAction SilentlyContinue

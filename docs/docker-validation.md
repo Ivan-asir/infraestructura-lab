@@ -27,7 +27,7 @@ Se ha comprobado la correcta inicialización de la base de datos `tienda` median
 
 ## 3. Prueba de persistencia
 
-Se ha insertado un cliente de prueba con el correo `persistencia@example.test` y se ha comprobado su permanencia tras detener y arrancar nuevamente el contenedor mediante `docker compose stop` y `docker compose start`.
+Se ha insertado un cliente de prueba con el correo `persistencia@example.test` y se ha comprobado su permanencia tras detener y arrancar nuevamente el contenedor mediante `docker compose down` y `docker compose up -d`.
 
 **Resultado:** el registro continúa existiendo después del reinicio (1 coincidencia).
 

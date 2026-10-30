@@ -83,18 +83,11 @@ Esto no incluye la comprobación automática adicional de WAL.
 
 ### Instante objetivo
 
-Se creó una fila de prueba en `public.pitr_marker` y se registró
-un instante UTC después de confirmar su inserción.
+Crea una fila en `public.pitr_marker`, confirma el `INSERT` y registra un instante UTC mediante `clock_timestamp()`. Después elimina únicamente esa tabla de prueba. Comprueba que la copia base precede a la operación y que el archivo WAL cubre el instante objetivo antes de recuperar.
 
-Posteriormente se ejecutó `DROP TABLE` para provocar la pérdida
-controlada del objeto.
+El instante objetivo de una ejecución nueva debe obtenerse en esa ejecución; no copiar fechas de las evidencias.
 
-Objetivo registrado:
-
-`2026-10-23 08:55:25.354183+00`
-
-Este instante pertenece a la ejecución documentada; no debe
-reutilizarse en una práctica nueva.
+Consulta el objetivo y los resultados de la ejecución conservada en `timeline.md` y `validation.txt`.
 
 ### Recuperación física
 
@@ -119,23 +112,19 @@ Los criterios siguientes se contrastaron con los resultados registrados en `vali
 
 ### Finalización
 
-Una vez confirmado el objetivo en los logs, se ejecutó:
+Una vez confirmado el objetivo en los logs, finaliza la recuperación con:
 
 ```sql
 SELECT pg_wal_replay_resume();
 ```
 
-Después se comprobó:
+Después comprueba:
 
 ```sql
 SELECT pg_is_in_recovery();
 ```
 
-Resultado obtenido: `f`.
-
-Finalmente se pudo consultar `public.pitr_marker` y recuperar:
-
-`Fila que debe sobrevivir`
+Resultado esperado después de finalizar: `f`. Consulta entonces `public.pitr_marker` y comprueba la fila confirmada antes del borrado. Captura las salidas reales en `validation.txt`.
 
 ## 7. Incidencias y limitaciones
 
@@ -157,9 +146,11 @@ mediante una lectura bloqueante de la tabla.
 
 ## 8. Reversión y recuperación
 
-La evidencia histórica `validation.txt` acredita el retorno al PGDATA original. El snapshot `04_backup_logico_restauracion` quedó disponible, pero **no se utilizó**.
+Para una ejecución nueva, verifica un snapshot de retorno antes de empezar. Al finalizar, conserva las evidencias fuera de la VM, apágala correctamente y restaura el snapshot previsto. Comprueba servicio, ruta de datos, estado de recuperación y datos esperados en ese punto.
 
-### Retorno al estado original
+La evidencia conservada en `validation.txt` acredita otro método: retorno al PGDATA original. El snapshot `04_backup_logico_restauracion` estaba disponible, pero no se utilizó.
+
+### Método de retorno de la ejecución conservada
 
 Se conservó el PGDATA anterior a PITR en:
 

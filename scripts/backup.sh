@@ -36,5 +36,5 @@ test -s "$SALIDA"
 # está dañado o no es reconocible por pg_restore, el comando falla y el script se detiene
 pg_restore --list "$SALIDA" >/dev/null
 
-# Mensaje de validación si todo lo anterior ha terminado correctamente
-printf 'Backup validado: %s\n' "$SALIDA"
+# El catálogo es legible; la restauración debe probarse por separado.
+printf 'Backup generado; catálogo legible (restauración pendiente): %s\n' "$SALIDA"

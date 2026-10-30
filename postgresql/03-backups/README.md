@@ -35,9 +35,7 @@ El backup se restaura en `tienda_restore`. La validación compara las cuatro tab
 
 ### Recuperación de una tabla específica
 
-Restaura solo la tabla `productos` en la base de datos `tienda_tabla_rescate`,
-compara datos recuperados y prepara un ensayo de corrección sobre `tienda`
-que finaliza con `ROLLBACK`. No se efectúa ninguna actualización de producción.
+Restaura el dump completo en una base auxiliar nueva `tienda_tabla_rescate` para incluir las dependencias. Después exporta solo `productos`, compara los datos mediante una tabla temporal en `tienda` y finaliza con `ROLLBACK`. No se modifica permanentemente la base original. Consulta los comandos en la sección 7 de [la guía de ejecución](../../docs/guia-ejecucion.md).
 
 ### Automatización
 
@@ -68,5 +66,6 @@ No publicar contraseñas, variables reales de `.env`, claves privadas, datos per
 
 ## 10. Estado y evidencias
 
-- **Estado:** VALIDADO; dump `14 288` bytes, restauración completa, tabla selectiva, timer y reversión transaccional.
+- **Ejecución conservada:** dump `14 288` bytes, restauración completa, recuperación de productos, timer y reversión transaccional registrados en `validation.txt`.
+- **Procedimiento de restauración auxiliar completa seguido de extracción de productos:** VALIDADO en `tienda_rescate_revision`; 100 productos recuperados, comparación sin diferencias y `ROLLBACK` confirmado.
 - **Evidencia:** `validation.txt`.

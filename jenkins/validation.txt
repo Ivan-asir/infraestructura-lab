@@ -15,11 +15,15 @@ VALIDACIÓN | JENKINS - CI AUTOGESTIONADA
 - Pipeline: infraestructura-lab-validacion, build #2.
 - Etapas: "Diagnóstico del agente", "Obtener código" y "Validar repositorio"; todas correctas.
 - Resultado del pipeline: SUCCESS.
+- Compose vigente: configuración válida; PostgreSQL CI healthy y pg_isready correcto; variables SQL ausentes del agente.
+- SSH: huella ED25519 idéntica tras recrear jenkins_agent: SHA256:UWt/luaeKiIbkAFTj7oWtWvKkRGXwtJ9qSzPQv2PAtw.
 
 3) INCIDENCIAS Y LIMITACIONES
 - Incidencia: cambio de clave de host SSH tras recrear el contenedor.
 - Corrección: volumen persistente para /etc/ssh y verificación de la nueva clave.
 - Pruebas SQL: no incluidas en el Jenkinsfile.
+- Conservar las claves SSH y los volúmenes al recrear los servicios afectados.
+- La configuración actual está comprobada; el build #2 corresponde a una ejecución anterior y se conserva como evidencia histórica.
 
 4) ESTADO FINAL Y REVERSIÓN
 - Estado final: controlador y agente operativos; pipeline ejecutado correctamente.

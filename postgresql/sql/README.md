@@ -8,6 +8,7 @@ Este directorio contiene **recursos comunes**, no una práctica independiente.
 - `seed.sql`: datos sintéticos de inicialización.
 - `exercises.sql`: soluciones de consultas.
 - `exercises.md`: enunciados y criterios.
+- `assertions.sql`: aserciones de recuentos, integridad y rechazo de valores inválidos en el fixture inicial.
 
 ## Uso y dependencia
 
@@ -15,4 +16,13 @@ Estos archivos se consumen desde `postgresql/02-sql-roles/` y desde `docker/` y 
 
 ## Validación
 
-La validación de este material queda registrada en `postgresql/02-sql-roles/validation.txt` y en las evidencias de los contenedores que lo utilizan. No se duplica aquí.
+En una base de CI desechable, después de cargar `schema.sql`, `seed.sql` y `exercises.sql`, ejecutar:
+
+```bash
+psql -X -v ON_ERROR_STOP=1 -f postgresql/sql/assertions.sql
+```
+
+La conexión se configura con las variables PostgreSQL del entorno de CI.
+Las comprobaciones se ejecutan en una transacción que termina con `ROLLBACK`.
+Cualquier incumplimiento debe devolver un código distinto de cero. No aplicar
+los recuentos del fixture a una base modificada por ejercicios de persistencia.

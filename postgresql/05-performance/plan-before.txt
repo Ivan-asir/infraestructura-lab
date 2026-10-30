@@ -1,0 +1,15 @@
+                                                       QUERY PLAN
+-------------------------------------------------------------------------------------------------------------------------
+ Gather  (cost=1000.00..5680.67 rows=20 width=110) (actual time=3.166..20.181 rows=24.00 loops=1)
+   Workers Planned: 2
+   Workers Launched: 2
+   Buffers: shared hit=3637
+   ->  Parallel Seq Scan on eventos  (cost=0.00..4678.67 rows=8 width=110) (actual time=1.104..12.133 rows=8.00 loops=3)
+         Filter: (usuario_id = 1234)
+         Rows Removed by Filter: 66659
+         Buffers: shared hit=3637
+ Planning:
+   Buffers: shared hit=72
+ Planning Time: 0.895 ms
+ Execution Time: 20.241 ms
+(12 filas)

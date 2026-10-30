@@ -3,7 +3,7 @@
 ## 1. Síntoma y alcance
 
 - Incidencia inicial: `kind create cluster` falló al publicar el puerto `34077` en Docker Desktop.
-- K3 (readiness): existen dos revisiones históricas y un despliegue disponible.
+- K3 (readiness): ruta `/ruta-inexistente-k3`, nuevo Pod `0/1 Ready` y fallo HTTP `404`, conservando disponibles las dos réplicas anteriores.
 
 ## 2. Entorno y evidencias previas
 
@@ -27,9 +27,13 @@ kind get clusters
 docker ps -a --filter 'name=infraestructura-lab-kubernetes'
 ```
 
+En K3, el evento `Warning Unhealthy` confirmó el fallo de la sonda de readiness con HTTP `404`.
+
 ## 4. Corrección aplicada
 
 Configurar la API en `127.0.0.1:34567` mediante `$HOME/.cache/infraestructura-lab/kubernetes/kind-config.yaml`. La nueva creación finalizó con `Ready after 16s`.
+
+En K3 se ejecutó `kubectl rollout undo deployment/web-lab` sobre el contexto y namespace previstos, recuperando la revisión anterior.
 
 ## 5. Validación posterior
 
@@ -45,12 +49,14 @@ Configurar la API en `127.0.0.1:34567` mediante `$HOME/.cache/infraestructura-la
 
 Estas comprobaciones acreditan el estado operativo **posterior**.
 
+En la nueva comprobación de K3, el Deployment recuperó `2/2`, la sonda volvió a `/` y `curl` devolvió HTTP `200 OK`.
+
 ## 6. Reversión y recuperación
 
-No se eliminaron reservas de Windows ni se reinició Docker Desktop. Para K3 se ha confirmado la disponibilidad de la revisión 3 y la respuesta HTTP.
+No se modificaron las reservas de Windows ni se eliminó el clúster. En K3 se ejecutó `rollout undo` y se confirmó la recuperación. Kubernetes mostró una advertencia sobre `last-applied-configuration`, sin impedir el rollback.
 
 ## 7. Estado y pendientes
 
 - Puerto `34567`: clúster creado satisfactoriamente.
 - K2: VALIDADO; dos réplicas y HTTP `200 OK`.
-- K3: estado funcional posterior y revisiones verificadas.
+- K3: incidencia de readiness y recuperación mediante rollback VALIDADAS.

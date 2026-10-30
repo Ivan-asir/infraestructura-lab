@@ -19,8 +19,8 @@ services:
       context: ./agent
     container_name: jenkins_agent
     restart: unless-stopped
-    env_file:
-      - .env
+    environment:
+      JENKINS_AGENT_SSH_PUBKEY: ${JENKINS_AGENT_SSH_PUBKEY:?Define la clave publica del agente}
     volumes:
       - jenkins_agent_ssh_host:/etc/ssh
     networks:
@@ -31,8 +31,10 @@ services:
     image: postgres:18
     container_name: jenkins_postgres_ci
     restart: unless-stopped
-    env_file:
-      - .env
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-postgres}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?Define la clave administrativa de CI}
+      CI_PASSWORD: ${CI_PASSWORD:?Define la clave del rol de CI}
     volumes:
       - jenkins_pg_ci_data:/var/lib/postgresql
       - ./initdb/01-create-ci-role.sh:/docker-entrypoint-initdb.d/01-create-ci-role.sh:ro

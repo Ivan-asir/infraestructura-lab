@@ -6,6 +6,7 @@ VALIDACIÓN | 03 - BACKUP LÓGICO Y RESTAURACIÓN
 - Alcance: dump lógico, restauración completa, tabla selectiva y timer.
 - Estado: VALIDADO (restauración de prueba y recuperación selectiva).
 - Dump utilizado: /var/lib/pgsql/backups/tienda_22-10-2026.dump.
+- Base de datos auxiliar: tienda_rescate_revision.
 
 2) COMPROBACIONES Y RESULTADOS
 - Dump: 14288 bytes; propietario postgres; permisos 0600.
@@ -23,6 +24,9 @@ VALIDACIÓN | 03 - BACKUP LÓGICO Y RESTAURACIÓN
 - CSV: 100 IDs únicos; diferencias con tabla original=0.
 - Prueba de importación temporal: COPY 100; ROLLBACK ejecutado;
   tabla temporal eliminada y sin cambios en la tabla original.
+- Nueva restauración en tienda_rescate_revision: 100 productos recuperados.
+- Extracción CSV y comparación temporal: COPY 100, diferencias=0;
+  ROLLBACK confirmado, sin modificar la tabla original.
 
 3) INCIDENCIAS Y LIMITACIONES
 - pg_restore --list por sí solo no prueba una restauración: se validó

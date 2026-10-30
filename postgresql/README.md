@@ -8,6 +8,7 @@ Este directorio agrupa prácticas y materiales compartidos de PostgreSQL. Es un 
 - [`02-sql-roles/`](02-sql-roles/README.md): SQL, roles y permisos.
 - [`03-backups/`](03-backups/README.md): backup lógico, restauración y timer.
 - [`04-pitr/`](04-pitr/README.md): WAL, copia base, PITR y reversión.
+- [`05-performance/`](05-performance/README.md): planes antes/después del índice y límites de la medición.
 - [`sql/`](sql/README.md): SQL compartido por distintas prácticas.
 
 ## Convenciones

@@ -17,6 +17,7 @@ VALIDACIÓN | JENKINS - CI AUTOGESTIONADA
 - Resultado del pipeline: SUCCESS.
 - Compose vigente: configuración válida; PostgreSQL CI healthy y pg_isready correcto; variables SQL ausentes del agente.
 - SSH: huella ED25519 idéntica tras recrear jenkins_agent: SHA256:UWt/luaeKiIbkAFTj7oWtWvKkRGXwtJ9qSzPQv2PAtw.
+- Pipeline del commit 583f9d1: build #6, SUCCESS.
 
 3) INCIDENCIAS Y LIMITACIONES
 - Incidencia: cambio de clave de host SSH tras recrear el contenedor.

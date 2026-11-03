@@ -1,0 +1,29 @@
+VALIDACIÓN | 07 - DOCKER SWARM
+==============================
+
+1) CONTEXTO
+- Entorno y contexto Docker: Ubuntu/WSL2 y Docker Desktop.
+- Estado previo: Swarm=inactive.
+- Alcance: un manager, pila `swarm_lab`, servicio `swarm_lab_web`.
+
+2) COMPROBACIONES Y RESULTADOS
+- Manager disponible y estado del nodo: Swarm=active, Control=true, Status=ready, Availability=active.
+- Despliegue inicial y réplica 2/2: Name=swarm_lab_web, Mode=replicated, Replicas=2/2.
+- Petición HTTP y código de respuesta: HTTP/1.1 200 OK.
+- Escalado a 3/3 y retorno a 2/2: Name=swarm_lab_web, Mode=replicated, Replicas=3/3, retorno correcto a 2/2.
+- Actualización gradual y variable LAB_REVISION=v2: actualización correcta y réplicas running.
+- Rollback y estado de la variable después de revertir: rollback correcto, réplicas running.
+
+
+3) INCIDENCIAS Y LIMITACIONES
+- No se registran incidencias en el proceso.
+- Limitación estructural: laboratorio de un solo nodo, sin alta disponibilidad.
+
+4) ESTADO FINAL Y REVERSIÓN
+- Estado final del servicio: servicio eliminado.
+- Pila conservada o retirada: pila retirada.
+- Estado final de Swarm en el Engine: Swarm=active.
+
+5) CONCLUSIÓN
+- Manager disponible, réplicas iniciadas, petición HTTP 200 OK y escalado/desescalado correctos.
+- Actualización y rollback ejecutados sin errores.

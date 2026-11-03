@@ -137,6 +137,6 @@ Práctica exclusiva de laboratorio con datos sintéticos. `EXPLAIN (ANALYZE, BUF
 
 ## 10. Estado y evidencias
 
-- **Estado: VALIDADO** para la nueva comparación de rendimiento realizada en `perf_lab_bench`.
+- **Estado:** VALIDADO para la nueva comparación de rendimiento realizada en `perf_lab_bench`.
 - **Evidencia consolidada en el repositorio:** `validation.txt`, con cinco medidas sin índice, cinco con índice, comparación del índice compuesto, comprobación de índices y límites del ensayo.
 - **Planes históricos conservados:** `plan-before.txt` y `plan-after.txt`, sin contexto temporal propio suficiente para atribuirles la versión o fecha de la nueva sesión.

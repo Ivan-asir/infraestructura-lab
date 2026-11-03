@@ -35,8 +35,7 @@ No se publican:
 - Datos reales o identificables.
 - Configuración de otros entornos.
 
-Si un secreto llega a un commit o a un remoto, debe revocarse o rotarse.
-Borrarlo en un commit posterior no elimina la exposición.
+Si un secreto llega a un commit o a un remoto, debe revocarse o rotarse. Borrarlo en un commit posterior no elimina la exposición.
 
 ## Regla de preparación
 

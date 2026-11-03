@@ -2,9 +2,9 @@ VALIDACIÓN | 07 - IMAGEN DOCKER PROPIA
 ======================================
 
 1) CONTEXTO
-- Entorno: Ubuntu/WSL2; proyecto Compose tienda-imagen-lab
-- Estado: VALIDADO para la ejecución descrita en `../../docs/docker-image-validation.md`
-- Alcance: Build y despliegue del servicio db_postgres_tienda_imagen
+- Entorno: Ubuntu/WSL2; proyecto Compose tienda-imagen-lab.
+- Estado: VALIDADO para la ejecución descrita en `../../docs/docker-image-validation.md`.
+- Alcance: Build y despliegue del servicio db_postgres_tienda_imagen.
 
 2) COMPROBACIONES Y RESULTADOS
 - Construcción: imagen `postgresql-tienda:lab`, ID `sha256:15f79b8c75cf5cb13a5634c997083de6ab1142f09841e26d7ce0061089d6fe7c`.

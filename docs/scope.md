@@ -1,8 +1,6 @@
 # Alcance actual del laboratorio
 
-Este repositorio contiene las prácticas implementadas y documentadas
-hasta la fecha. Los bloques futuros se incorporarán progresivamente
-cuando se hayan realizado y validado.
+Este repositorio contiene las prácticas implementadas y documentadas hasta la fecha. Los bloques futuros se incorporarán progresivamente cuando se hayan realizado y validado.
 
 ## Sistemas y redes
 
@@ -49,9 +47,4 @@ cuando se hayan realizado y validado.
 
 ## Evidencias
 
-Cada práctica conserva documentación técnica y resultados reales
-de validación. Las evidencias `validation.txt` siguen el formato
-definido en `docs/plantilla-validaciones.md`.
-
-Las tecnologías y acciones todavía no ejecutadas se incorporarán
-al repositorio cuando corresponda.
+Cada práctica conserva documentación técnica y resultados reales de validación. Las evidencias `validation.txt` siguen el formato definido en `docs/plantilla-validaciones.md`.

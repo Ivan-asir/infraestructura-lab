@@ -50,8 +50,7 @@ El detalle de los parámetros está en `configuration.md`.
 
 ### Copia base
 
-La copia física se realiza con `pg_basebackup`, sobre un
-directorio de destino que no contenga archivos anteriores.
+La copia física se realiza con `pg_basebackup`, sobre un directorio de destino que no contenga archivos anteriores.
 
 Comando de referencia:
 
@@ -61,8 +60,7 @@ sudo -u postgres pg_basebackup \
   -Fp -Xs -P
 ```
 
-Antes de ejecutarlo es imprescindible comprobar que el destino
-está disponible y que existe espacio suficiente.
+Antes de ejecutarlo es imprescindible comprobar que el destino está disponible y que existe espacio suficiente.
 
 Para una nueva práctica, ejecutar la verificación completa antes de simular el borrado o detener PostgreSQL. Si falta una dependencia, resolverla antes de continuar:
 
@@ -119,8 +117,7 @@ La recuperación requiere:
 
 La configuración utilizada se describe en `configuration.md`.
 
-**Advertencia:** no repetir esta secuencia sobre el clúster actual
-sin comprobar antes los directorios y el procedimiento de retorno.
+**Advertencia:** no repetir esta secuencia sobre el clúster actual sin comprobar antes los directorios y el procedimiento de retorno.
 
 ## 6. Comprobaciones y criterios de aceptación
 
@@ -153,12 +150,9 @@ Se alcanzó el instante objetivo con:
 - `pg_is_in_recovery() = t`.
 - `pg_get_wal_replay_pause_state() = paused`.
 
-La lectura de `public.pitr_marker` quedó bloqueada por un
-`AccessExclusiveLock` del proceso `startup` durante la recuperación.
+La lectura de `public.pitr_marker` quedó bloqueada por un `AccessExclusiveLock` del proceso `startup` durante la recuperación.
 
-Por este motivo, la validación de la pausa se realizó mediante
-las funciones de recuperación y el log de PostgreSQL, no
-mediante una lectura bloqueante de la tabla.
+Por este motivo, la validación de la pausa se realizó mediante las funciones de recuperación y el log de PostgreSQL, no mediante una lectura bloqueante de la tabla.
 
 ## 8. Reversión y recuperación
 
@@ -172,12 +166,9 @@ Se conservó el PGDATA anterior a PITR en:
 
 `/var/lib/pgsql/data-after-drop`
 
-El procedimiento de retorno consiste en detener PostgreSQL,
-conservar el clúster PITR en otro directorio y devolver el
-PGDATA original a `/var/lib/pgsql/data`.
+El procedimiento de retorno consiste en detener PostgreSQL, conservar el clúster PITR en otro directorio y devolver el PGDATA original a `/var/lib/pgsql/data`.
 
-No restaurar directamente un snapshot antiguo sin evaluar
-los cambios que se perderían.
+No restaurar directamente un snapshot antiguo sin evaluar los cambios que se perderían.
 
 El retorno se considera validado únicamente cuando:
 
@@ -192,19 +183,12 @@ El retorno se considera validado únicamente cuando:
 
 Ejecutar en una VM de laboratorio y con opciones para revertir cambios disponibles.
 
-Antes de detener PostgreSQL deben verificarse el servicio,
-las rutas, el espacio disponible y la existencia de la copia base.
+Antes de detener PostgreSQL deben verificarse el servicio, las rutas, el espacio disponible y la existencia de la copia base.
 
-No sobrescribir directorios existentes ni eliminar el clúster
-original para realizar la recuperación.
+No sobrescribir directorios existentes ni eliminar el clúster original para realizar la recuperación.
 
 ## 10. Estado y evidencias
 
 - **Estado:** PITR y retorno al PGDATA original VALIDADOS.
 - **Evidencias:** `validation.txt` y `timeline.md`; configuración en `configuration.md`.
 - **Limitación documentada:** `pg_verifybackup --no-parse-wal` correcto; verificación WAL completa no ejecutada por ausencia de `pg_waldump`.
-
-### Evidencias
-
-Consultar `validation.txt` para los resultados reales, las
-incidencias encontradas y el estado de la reversión.

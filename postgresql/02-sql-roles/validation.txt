@@ -14,8 +14,7 @@ VALIDACIÓN | 02 - SQL, ROLES Y PERMISOS
 - Permisos: tienda_readwrite tiene INSERT, SELECT, UPDATE y DELETE
   (arwd) en las cuatro tablas; acceso rU a las secuencias listadas.
 - Lectura con SET ROLE tienda_readonly: COUNT(clientes)=24.
-- Escritura como tienda_readonly: ERROR "permiso denegado a la tabla productos"
-  (resultado esperado, control de permisos correcto).
+- Escritura como tienda_readonly: ERROR "permiso denegado a la tabla productos" (resultado esperado, control de permisos correcto).
 - INSERT con tienda_readwrite: INSERT 0 1; se ejecutó ROLLBACK.
 - Validación final: productos=100; productos_de_prueba=0.
 

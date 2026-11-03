@@ -21,5 +21,4 @@
                                      mariadb-lab .30
 ```
 
-La red Host-only se utiliza para administración y tráfico privado del
-laboratorio. La salida por defecto a Internet permanece en NAT.
+La red Host-only se utiliza para administración y tráfico privado del laboratorio. La salida por defecto a Internet permanece en NAT.

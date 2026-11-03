@@ -24,5 +24,5 @@ psql -X -v ON_ERROR_STOP=1 -f postgresql/sql/assertions.sql
 
 La conexión se configura con las variables PostgreSQL del entorno de CI.
 Las comprobaciones se ejecutan en una transacción que termina con `ROLLBACK`.
-Cualquier incumplimiento debe devolver un código distinto de cero. No aplicar
-los recuentos del fixture a una base modificada por ejercicios de persistencia.
+Cualquier incumplimiento debe devolver un código distinto de cero.
+No aplicar los recuentos del fixture a una base modificada por ejercicios de persistencia.

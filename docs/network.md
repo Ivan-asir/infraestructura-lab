@@ -7,8 +7,7 @@ La VM `pg-primary` utiliza dos adaptadores:
 - NAT: salida a Internet, DNF y descargas.
 - Host-only: administración por SSH y tráfico privado del laboratorio.
 
-La red Host-only utilizada es `192.168.56.0/24`. No tiene gateway ni DNS.
-La ruta por defecto debe permanecer en el adaptador NAT.
+La red Host-only utilizada es `192.168.56.0/24`. No tiene gateway ni DNS. La ruta por defecto debe permanecer en el adaptador NAT.
 
 ## Direccionamiento
 

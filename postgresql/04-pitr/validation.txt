@@ -2,7 +2,7 @@ VALIDACIÓN | 04 - WAL Y RECUPERACIÓN PITR
 =========================================
 
 1) CONTEXTO
-- pg-primary, Rocky Linux 9, PostgreSQL 18.6; 2026-10-23, Europe/Madrid (CEST).
+- pg-primary, Rocky Linux 9, PostgreSQL 18.6.
 - Recuperación física del clúster; prueba en tienda.public.pitr_marker.
 
 2) COMPROBACIONES Y RESULTADOS

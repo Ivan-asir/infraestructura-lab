@@ -53,5 +53,5 @@ Excluir `.env`, claves, dumps y ficheros privados del contexto y del repositorio
 
 - **Ejecución conservada:** pruebas con el proyecto `tienda-imagen-lab` y el volumen de aquella ejecución; ver los archivos de evidencia.
 - **Configuración vigente:** proyecto `infraestructura-lab-docker-postgresql-imagen` y volumen `tienda_imagen`.
-- Evidencia ampliada: `../../docs/docker-image-validation.md`.
-- Resumen estructurado: `validation.txt`.
+- **Evidencia ampliada:** `../../docs/docker-image-validation.md`.
+- **Resumen estructurado:** `validation.txt`.

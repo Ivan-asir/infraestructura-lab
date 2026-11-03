@@ -1,9 +1,6 @@
 # Validación de la imagen PostgreSQL personalizada con Docker Compose
 
-> **Alcance de este registro:** los nombres `tienda-imagen-lab` y
-> `tienda-imagen-lab_pg_tienda_imagen_data` corresponden a la ejecución
-> documentada. La configuración vigente usa el proyecto
-> `infraestructura-lab-docker-postgresql-imagen` y la clave `tienda_imagen`.
+> **Alcance de este registro:** los nombres `tienda-imagen-lab` y `tienda-imagen-lab_pg_tienda_imagen_data` corresponden a la ejecución documentada. La configuración vigente usa el proyecto `infraestructura-lab-docker-postgresql-imagen` y la clave `tienda_imagen`.
 
 ## 1) Objetivo y alcance
 
@@ -105,16 +102,10 @@ La imagen contiene **scripts de inicialización**, no una base de datos ya carga
 
 ### Conclusión
 
-Las pruebas registradas muestran que se ha construido
-una imagen PostgreSQL personalizada a partir de
-`postgres:18`, incorporando los scripts del repositorio.
+Las pruebas registradas muestran que se ha construido una imagen PostgreSQL personalizada a partir de `postgres:18`, incorporando los scripts del repositorio.
 
-El contenedor desplegado mediante Docker Compose funciona
-correctamente, presenta los recuentos esperados y conserva
-los datos tras detenerse y arrancarse nuevamente.
+El contenedor desplegado mediante Docker Compose funciona correctamente, presenta los recuentos esperados y conserva los datos tras detenerse y arrancarse nuevamente.
 
-Para ello se emplea un proyecto, puerto y volumen
-independientes de la instancia principal.
+Para ello se emplea un proyecto, puerto y volumen independientes de la instancia principal.
 
-La imagen contiene scripts de inicialización, no una base
-de datos precargada ni una copia de seguridad.
+La imagen contiene scripts de inicialización, no una base de datos precargada ni una copia de seguridad.

@@ -27,8 +27,7 @@ Desde `docker/`, revisar el archivo `.env` local sin publicarlo, comprobar `dock
 
 ## 5. Procedimiento de ejecución
 
-Desde `docker/`, validar con `docker compose config --quiet`, iniciar con
-`docker compose up -d` y comprobar el servicio `db_postgres_tienda` y el contenedor `db_postgres_tienda` mediante `docker compose ps`.
+Desde `docker/`, validar con `docker compose config --quiet`, iniciar con `docker compose up -d` y comprobar el servicio `db_postgres_tienda` y el contenedor `db_postgres_tienda` mediante `docker compose ps`.
 
 La instancia usa `../postgresql/sql/schema.sql`, `../postgresql/sql/seed.sql` y el volumen `tienda_data`. Al inicializar una base vacía debe haber 24 clientes, 100 productos, 200 pedidos y 200 líneas. Los SQL de inicialización no se repiten al arrancar un volumen ya utilizado.
 

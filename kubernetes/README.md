@@ -110,4 +110,4 @@ Mantener la API en loopback; no publicar kubeconfig, tokens, certificados ni sec
 - **K3:** VALIDADO. Fallo controlado de readiness HTTP `404`, recuperación mediante `rollout undo`, Deployment `2/2` y respuesta HTTP `200 OK` posterior.
 - **Evidencias:** `validation.txt`.
 - **Incidencias:** `troubleshooting.md`.
-- **Acceso interno DNS/Service:** VALIDADO en la ejecución adicional de `validation.txt`: resolución DNS, HTTP 200, cliente `Succeeded`/código 0 y endpoints listos.
+- **Acceso interno DNS/Service:** VALIDADO en la ejecución adicional de `validation.txt` con resolución DNS, HTTP 200, cliente `Succeeded`/código 0 y endpoints listos.

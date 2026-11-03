@@ -7,5 +7,4 @@
 | `03_sql_roles_permisos` | Inserción de datos, roles y permisos en bases de datos | `SI` |
 | `04_backup_logico_restauracion` | Estado anterior a la práctica PITR | `SI` |
 
-Los snapshots son puntos de restauración del laboratorio y no sustituyen un
-backup de PostgreSQL. Los discos y snapshots de VirtualBox no se versionan.
+Los snapshots son puntos de restauración del laboratorio y no sustituyen un backup de PostgreSQL. Los discos y snapshots de VirtualBox no se versionan.

@@ -20,8 +20,7 @@ VALIDACIÓN | 01 - INSTALACIÓN DE POSTGRESQL
 
 4) ESTADO FINAL Y REVERSIÓN
 - Estado final observado: servicio operativo y objetos iniciales presentes.
-- Reversión: NO APLICA, se trata de la instalación inicial
-  y no se realiza ninguna reversión durante esta validación.
+- Reversión: NO APLICA, se trata de la instalación inicial y no se realiza ninguna reversión durante esta validación.
 
 5) CONCLUSIÓN
 - Instalación y objetos iniciales comprobados en el entorno.

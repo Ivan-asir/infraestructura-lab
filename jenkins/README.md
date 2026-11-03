@@ -26,35 +26,19 @@ Desde `jenkins/`, verificar `docker compose config --quiet`, los contenedores ex
 
 ## 5. Procedimiento de ejecución
 
-El proyecto Compose `infraestructura-lab-jenkins` ejecuta `jenkins_controller`,
-`jenkins_agent` y `jenkins_postgres_ci` dentro de la red `ci`.
+El proyecto Compose `infraestructura-lab-jenkins` ejecuta `jenkins_controller`, `jenkins_agent` y `jenkins_postgres_ci` dentro de la red `ci`.
 
 ### Variables por servicio
 
-El agente recibe únicamente `JENKINS_AGENT_SSH_PUBKEY`. PostgreSQL CI recibe
-`POSTGRES_USER`, `POSTGRES_PASSWORD` y `CI_PASSWORD`. El archivo `.env` privado
-sirve para interpolar esos valores; no se inyecta completo en los contenedores.
-No publicar su contenido ni la salida de `docker compose config` sin `--quiet`.
+El agente recibe únicamente `JENKINS_AGENT_SSH_PUBKEY`. PostgreSQL CI recibe `POSTGRES_USER`, `POSTGRES_PASSWORD` y `CI_PASSWORD`. El archivo `.env` privado sirve para interpolar esos valores; no se inyecta completo en los contenedores. No publicar su contenido ni la salida de `docker compose config` sin `--quiet`.
 
-El pipeline base descarga el repositorio y ejecuta validaciones estáticas.
-PostgreSQL CI es una instancia independiente; el Jenkinsfile base no ejecuta
-pruebas SQL ni despliega la aplicación Kubernetes.
+El pipeline base descarga el repositorio y ejecuta validaciones estáticas. PostgreSQL CI es una instancia independiente; el Jenkinsfile base no ejecuta pruebas SQL ni despliega la aplicación Kubernetes.
 
 ### Identidad SSH del agente
 
-El servicio `jenkins_agent` monta el volumen Docker con nombre
-`jenkins_agent_ssh_host` en `/etc/ssh`. El volumen se administra mediante
-Docker Compose (no utiliza `external: true`) y conserva las claves de host SSH
-cuando se recrea el contenedor. Estas claves identifican al **servidor SSH**
-ante el controller y **no** son el par de cliente almacenado en las credenciales
-Jenkins y `JENKINS_AGENT_SSH_PUBKEY`.
+El servicio `jenkins_agent` monta el volumen Docker con nombre `jenkins_agent_ssh_host` en `/etc/ssh`. El volumen se administra mediante Docker Compose (no utiliza `external: true`) y conserva las claves de host SSH cuando se recrea el contenedor. Estas claves identifican al **servidor SSH** ante el controller y **no** son el par de cliente almacenado en las credenciales Jenkins y `JENKINS_AGENT_SSH_PUBKEY`.
 
-La primera recreación con un volumen vacío puede generar **una clave de host
-nueva**, incluso si antes se había recreado el contenedor sin ese montaje.
-La identidad definitiva es la obtenida **después** de montar el volumen y
-arrancar el agente. Verifica su clave pública en el contenedor y configúrala en
-**Manage Jenkins → Nodes → jenkins_agent → Configure → Host Key Verification
-Strategy → Manually provided key Verification Strategy**.
+La primera recreación con un volumen vacío puede generar **una clave de host nueva**, incluso si antes se había recreado el contenedor sin ese montaje. La identidad definitiva es la obtenida **después** de montar el volumen y arrancar el agente. Verifica su clave pública en el contenedor y configúrala en **Manage Jenkins → Nodes → jenkins_agent → Configure → Host Key Verification Strategy → Manually provided key Verification Strategy**.
 
 ## 6. Comprobaciones y criterios de aceptación
 
@@ -84,8 +68,7 @@ docker compose exec -T jenkins_agent sh -c \
 
 Código de salida esperado: `0`. La comprobación no sustituye la verificación del nodo ni la ejecución del pipeline.
 
-Para **probar** la persistencia, anotar la huella, confirmar que no hay builds en
-curso y, durante una ventana de mantenimiento, recrear únicamente el agente:
+Para **probar** la persistencia, anotar la huella, confirmar que no hay builds en curso y, durante una ventana de mantenimiento, recrear únicamente el agente:
 
 ```bash
 docker compose up -d --no-deps --no-build --force-recreate jenkins_agent

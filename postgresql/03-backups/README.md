@@ -24,8 +24,7 @@ Comprobar capacidad y permisos en `/var/lib/pgsql/backups`, la existencia del ba
 
 ### Backup
 
-El backup se crea en formato custom con `pg_dump -Fc` dentro de
-`/var/lib/pgsql/backups`.
+El backup se crea en formato custom con `pg_dump -Fc` dentro de `/var/lib/pgsql/backups`.
 
 Los ficheros `*.dump` no se almacenan en Git.
 
@@ -48,9 +47,7 @@ Restaura el dump completo en una base auxiliar nueva `tienda_tabla_rescate` para
 
 Los criterios siguientes se contrastaron con los resultados registrados en `validation.txt`.
 
-Cada backup se comprueba preliminarmente con `pg_restore --list` (solo consulta,
-no restaura la base de datos). La validación completa requiere ejecutar una restauración
-independiente y comprobar sus datos.
+Cada backup se comprueba preliminarmente con `pg_restore --list` (solo consulta, no restaura la base de datos). La validación completa requiere ejecutar una restauración independiente y comprobar sus datos.
 
 ## 7. Incidencias y limitaciones
 

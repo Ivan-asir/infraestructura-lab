@@ -43,14 +43,11 @@ En `pg-primary`, verificar `systemctl is-active postgresql.service`, `pg_isready
 
 ### Creación de objetos iniciales
 
-El archivo `create-lab-db.sql` permite crear el rol
-`app_user`, la base `appdb` y el esquema `app`.
+El archivo `create-lab-db.sql` permite crear el rol `app_user`, la base `appdb` y el esquema `app`.
 
-Está destinado a instalaciones nuevas y debe ejecutarse
-una sola vez, sobre un entorno donde no existan los objetos.
+Está destinado a instalaciones nuevas y debe ejecutarse una sola vez, sobre un entorno donde no existan los objetos.
 
-La contraseña de `app_user` se configura posteriormente
-de forma interactiva mediante `\password app_user`.
+La contraseña de `app_user` se configura posteriormente de forma interactiva mediante `\password app_user`.
 
 ## 6. Comprobaciones y criterios de aceptación
 

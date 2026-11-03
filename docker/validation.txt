@@ -2,10 +2,10 @@ VALIDACIÓN | 07 - DOCKER COMPOSE
 ================================
 
 1) CONTEXTO
-- Entorno: Ubuntu/WSL2 y Docker Desktop; servicio db_postgres_tienda
+- Entorno: Ubuntu/WSL2 y Docker Desktop; servicio db_postgres_tienda.
 - Evidencia: `../docs/docker-validation.md` (Docker Engine 29.9.1; Compose 5.6.0; PostgreSQL 18).
-- Estado: VALIDADO
-- Alcance: PostgreSQL de pruebas, datos iniciales y persistencia
+- Estado: VALIDADO.
+- Alcance: PostgreSQL de pruebas, datos iniciales y persistencia.
 
 2) COMPROBACIONES Y RESULTADOS
 - `../docs/docker-validation.md`: contenedor `db_postgres_tienda` con healthcheck `healthy`.

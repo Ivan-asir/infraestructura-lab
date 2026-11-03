@@ -329,8 +329,8 @@ En estos comandos se parte de `docker/` después de iniciar el Compose principal
 
 El repositorio contiene dos flujos en `.github/workflows/`:
 
-- `validate.yml`: estructura, cambios preparados y sintaxis Bash con `scripts/validate-repository.sh`.
-- `postgresql-tests.yml`: servidor PostgreSQL efímero, carga SQL, consultas y comprobación de recuentos.
+- `validate.yml`: comprobación de cambios, espacios finales del árbol versionado, nombres sensibles y sintaxis de todos los `*.sh` mediante `scripts/validate-repository.sh`. No valida secretos por contenido ni semántica YAML/SQL.
+- `postgresql-tests.yml`: PostgreSQL efímero; carga de esquema y datos; consultas, recuentos y restricciones mediante `postgresql/sql/assertions.sql`. La etapa de aserciones se mantiene una sola vez.
 
 Tras un `git push`, consultar los resultados en la pestaña **Actions** del repositorio. Una ejecución correcta de CI **no valida la VM Rocky Linux, los timers systemd ni una restauración real**.
 
@@ -587,7 +587,11 @@ En **otra terminal**, abrir la página mediante:
 curl -i --max-time 10 http://127.0.0.1:18081/
 ```
 
-También se puede abrir `http://127.0.0.1:18081/` en el navegador del equipo. Un `HTTP 200` y la página del laboratorio indican que el Service permite acceder a la aplicación. Para detener únicamente el `port-forward`, pulsar `Ctrl+C` en la primera terminal.
+También se puede abrir `http://127.0.0.1:18081/` en el navegador del equipo. Un HTTP 200 con la página del laboratorio confirma acceso local a la aplicación por el túnel. `kubectl port-forward svc/web-lab` selecciona un Pod mediante el Service y reenvía el tráfico hacia ese Pod: no prueba por sí solo DNS, ClusterIP ni reparto entre réplicas.
+
+Para comprobar el acceso interno mediante DNS y Service, seguir la prueba «Cliente interno DNS/Service» de [kubernetes/README.md](../kubernetes/README.md#cliente-interno-dnsservice), conservar sus resultados y registrarlos por separado en `kubernetes/validation.txt`.
+
+Para detener únicamente el túnel, pulsar `Ctrl+C` en la primera terminal. No elimina el Service ni los Pods.
 
 ### 12.5. K3 — Incidencia controlada y recuperación (opcional)
 

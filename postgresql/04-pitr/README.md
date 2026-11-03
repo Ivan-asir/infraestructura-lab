@@ -64,7 +64,7 @@ sudo -u postgres pg_basebackup \
 Antes de ejecutarlo es imprescindible comprobar que el destino
 está disponible y que existe espacio suficiente.
 
-Verificación completa, si las herramientas están disponibles:
+Para una nueva práctica, ejecutar la verificación completa antes de simular el borrado o detener PostgreSQL. Si falta una dependencia, resolverla antes de continuar:
 
 ```bash
 cd /tmp
@@ -80,6 +80,22 @@ sudo -u postgres pg_verifybackup --no-parse-wal \
 ```
 
 Esto no incluye la comprobación automática adicional de WAL.
+
+### Si falta pg_waldump
+
+En `pg-primary`, como `labadmin`, identificar rutas y proveedor:
+
+```bash
+sudo -u postgres sh -c 'command -v pg_verifybackup; command -v pg_waldump'
+rpm -ql postgresql-server | grep -E '/(pg_verifybackup|pg_waldump)$'
+dnf provides '*/pg_waldump'
+```
+
+Las consultas no modifican la base de datos; DNF puede actualizar su caché de metadatos y necesita acceso a repositorios. Comprobar las versiones y el error exacto. Si falta un paquete, identificar el proveedor compatible con PostgreSQL 18 AppStream antes de instalarlo; no mezclar PGDG, crear enlaces ni alterar PATH sin diagnóstico.
+
+`pg_verifybackup --no-parse-wal` comprueba archivos y checksums, pero no el análisis WAL. La recuperación funcional PITR y la verificación automática completa son pruebas distintas. No repetir PITR para completar esta comprobación: si se conserva una copia base adecuada, verificarla y registrar una ejecución separada. Si no existe esa copia, dejar la comprobación pendiente.
+
+La ejecución documentada acredita PITR y retorno al PGDATA original, con verificación automática WAL incompleta. Una comprobación posterior no cambia retroactivamente ese resultado.
 
 ### Instante objetivo
 

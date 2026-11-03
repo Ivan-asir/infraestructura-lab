@@ -27,20 +27,22 @@ $ getent hosts download.rockylinux.org
 $ ssh labadmin@192.168.56.20 hostname
 pg-primary
 $ ip route show default
-default via 10.0.2.2 dev enp0s3 proto dhcp src 10.0.2.15 metric 100 
+default via 10.0.2.2 dev enp0s3 proto dhcp src 10.0.2.15 metric 100
 
 $ ip -6 route show default
 default via fe80::2 dev enp0s3 proto ra metric 100 pref medium
 
 $ ip -4 route get 1.1.1.1
-1.1.1.1 via 10.0.2.2 dev enp0s3 src 10.0.2.15 uid 1000 
-    cache 
+1.1.1.1 via 10.0.2.2 dev enp0s3 src 10.0.2.15 uid 1000
+    cache
 
 $ curl -4 -I --connect-timeout 5 --max-time 10 https://rockylinux.org
   % Total    % Received % Xferd  Average Speed   Time    Time     Time  Current
                                  Dload  Upload   Total   Spent    Left  Speed
-  0     0    0     0    0     0      0      0 --:--:-- --:--:-- --:--:--     0  0  334k    0     0    0     0      0      0 --:--:-- --:--:-- --:--:--     0
-HTTP/2 200 
+
+  0     0    0     0    0     0      0      0 --:--:-- --:--:-- --:--:--     0
+  0  334k    0     0    0     0      0      0 --:--:-- --:--:-- --:--:--     0
+HTTP/2 200
 age: 1126
 cache-control: public, max-age=0, must-revalidate
 content-type: text/html; charset=utf-8
@@ -58,4 +60,3 @@ x-powered-by: Next.js
 x-vercel-cache: HIT
 x-vercel-id: cdg1::iad1::9g48r-1791979314061-ec1f7e6f978a
 content-length: 342185
-

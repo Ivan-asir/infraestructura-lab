@@ -1,6 +1,6 @@
 # Integración continua del laboratorio
 
-- `validate.yml` ejecuta `bash scripts/validate-repository.sh`.
+- `validate.yml` ejecuta `bash scripts/validate-repository.sh`: comprueba los cambios preparados y no preparados, los espacios finales de todos los archivos de texto versionados, los nombres de archivos sensibles y la sintaxis de todos los `*.sh` versionados, incluidos los de subdirectorios. Los archivos nuevos deben prepararse expresamente para quedar incluidos. No analiza secretos por contenido ni valida semántica YAML, Kubernetes o SQL.
 - `postgresql-tests.yml` crea una base efímera `tienda`, carga esquema y datos, ejecuta las consultas y comprueba recuentos y restricciones con `assertions.sql`.
 - Los workflows arrancan automáticamente al hacer `git push` y al abrir una pull request.
 - También admiten ejecución manual desde GitHub → Actions → workflow → Run workflow (solo si están publicados en la rama predeterminada).

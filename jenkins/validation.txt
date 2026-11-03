@@ -2,34 +2,24 @@ VALIDACIÓN | JENKINS - CI AUTOGESTIONADA
 ========================================
 
 1) CONTEXTO
-- Entorno: Ubuntu/WSL2, Docker Compose y Jenkins con agente SSH.
-- Commit probado: dba1bc1fe08d0c39f6e9cfdcadd2d68637888408
+- Ubuntu/WSL2, Docker Compose y Jenkins con agente SSH; pipeline infraestructura-lab-validacion.
+- Build #2: commit dba1bc1fe08d0c39f6e9cfdcadd2d68637888408. Build #6: commit 583f9d1.
 
 2) COMPROBACIONES Y RESULTADOS
-- Contenedores: controller y agente activos; PostgreSQL CI activo y healthy.
-- Nodo jenkins_agent: ONLINE.
-- Ejecutores: controlador=0; agente=1.
-- Identidad SSH del agente: verificada mediante clave de host configurada manualmente.
-- Persistencia SSH: volumen jenkins_agent_ssh_host montado en /etc/ssh.
-- Huella SSH tras recreación: COINCIDE.
-- Pipeline: infraestructura-lab-validacion, build #2.
-- Etapas: "Diagnóstico del agente", "Obtener código" y "Validar repositorio"; todas correctas.
-- Resultado del pipeline: SUCCESS.
-- Compose vigente: configuración válida; PostgreSQL CI healthy y pg_isready correcto; variables SQL ausentes del agente.
-- SSH: huella ED25519 idéntica tras recrear jenkins_agent: SHA256:UWt/luaeKiIbkAFTj7oWtWvKkRGXwtJ9qSzPQv2PAtw.
-- Pipeline del commit 583f9d1: build #6, SUCCESS.
+- Controller/agente activos; nodo jenkins_agent ONLINE; ejecutores controlador=0/agente=1.
+- Compose válido; PostgreSQL CI healthy y pg_isready correcto; variables SQL ausentes del agente.
+- Builds #2 y #6: SUCCESS. En #2: Diagnóstico del agente, Obtener código y Validar repositorio correctos.
+- Clave de host verificada manualmente; volumen jenkins_agent_ssh_host en /etc/ssh.
+- Huella ED25519 igual tras recrear el agente: SHA256:UWt/luaeKiIbkAFTj7oWtWvKkRGXwtJ9qSzPQv2PAtw.
 
 3) INCIDENCIAS Y LIMITACIONES
-- Incidencia: cambio de clave de host SSH tras recrear el contenedor.
-- Corrección: volumen persistente para /etc/ssh y verificación de la nueva clave.
-- Pruebas SQL: no incluidas en el Jenkinsfile.
-- Conservar las claves SSH y los volúmenes al recrear los servicios afectados.
-- La configuración actual está comprobada; el build #2 corresponde a una ejecución anterior y se conserva como evidencia histórica.
+- Cambio de clave al recrear el agente: corregido mediante persistencia de /etc/ssh y verificación de identidad.
+- Jenkinsfile sin pruebas SQL. Los builds corresponden a ejecuciones distintas; no acreditan disponibilidad actual.
 
 4) ESTADO FINAL Y REVERSIÓN
-- Estado final: controlador y agente operativos; pipeline ejecutado correctamente.
-- Parada controlada: docker compose down.
-- Volúmenes persistentes: jenkins_home y jenkins_pg_ci_data presentes.
+- Controlador/agente operativos y pipeline correcto al comprobarlos.
+- Parada registrada: docker compose down; jenkins_home y jenkins_pg_ci_data conservados.
+- Conservar también las claves y jenkins_agent_ssh_host al recrear el agente.
 
 5) CONCLUSIÓN
-- Jenkins y ejecución del pipeline: VALIDADOS.
+- VALIDADO: agente SSH, persistencia de su identidad y pipeline de validación estática.

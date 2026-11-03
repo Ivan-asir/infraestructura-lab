@@ -13,14 +13,11 @@
 
 ## Validación común
 
-El script `scripts/validate-repository.sh` comprueba que se ejecuta dentro de
-un repositorio Git, revisa los cambios con `git diff --check` y
-`git diff --cached --check`, detecta algunos nombres de archivos sensibles
-entre los versionados y valida los scripts de `scripts/` con `bash -n`.
+El script `scripts/validate-repository.sh` comprueba que se ejecuta dentro de un repositorio Git y trabaja desde su raíz. Revisa cambios con `git diff --check` y `git diff --cached --check`, espacios finales en todos los archivos de texto versionados del árbol de trabajo, nombres de archivos sensibles y sintaxis de todos los `*.sh` versionados mediante `bash -n`.
 
-No analiza el contenido para detectar secretos ni ejecuta ShellCheck,
-`ansible-playbook` o `ansible-lint`. Esas comprobaciones, cuando se utilicen,
-deben ejecutarse por separado.
+En CI, la comprobación de espacios finales se aplica al checkout completo aunque no existan diferencias locales. Los archivos nuevos no quedan incluidos hasta prepararlos expresamente con `git add`.
+
+No detecta secretos dentro del contenido ni ejecuta ShellCheck, validación semántica YAML, `ansible-playbook` o `ansible-lint`. Las pruebas SQL corresponden al workflow `postgresql-tests.yml`. Ninguno de estos controles valida por sí solo los servicios o restauraciones de las VMs.
 
 ## Política de publicación
 

@@ -2,42 +2,26 @@ VALIDACIÓN | 03 - BACKUP LÓGICO Y RESTAURACIÓN
 ==============================================
 
 1) CONTEXTO
-- Entorno: pg-primary (PostgreSQL 18.6); base de datos original tienda.
-- Alcance: dump lógico, restauración completa, tabla selectiva y timer.
-- Estado: VALIDADO (restauración de prueba y recuperación selectiva).
-- Dump utilizado: /var/lib/pgsql/backups/tienda_22-10-2026.dump.
-- Base de datos auxiliar: tienda_rescate_revision.
+- pg-primary, PostgreSQL 18.6; origen tienda. Alcance: dump, restore, recuperación selectiva y timer.
+- Dump: /var/lib/pgsql/backups/tienda_22-10-2026.dump; auxiliar adicional: tienda_rescate_revision.
 
 2) COMPROBACIONES Y RESULTADOS
-- Dump: 14288 bytes; propietario postgres; permisos 0600.
-- Fecha de modificación: 2026-10-22 11:37:29.352392955 +0200.
-- pg_restore --list: catálogo legible; CUSTOM, gzip, 41 entradas;
-  servidor de origen PostgreSQL 18.6, pg_dump 18.6.
-- Restauración completa en tienda_restore: recuentos iguales a tienda:
-  clientes=24, productos=100, pedidos=200, pedido_items=200.
-- Servicio pg-lab-backup.service: Result=success; ExecMainStatus=0.
-- Timer pg-lab-backup.timer: enabled y active al registrar evidencia.
-- Próxima ejecución indicada entonces: 2026-10-23 00:02:24 CEST.
-- Recuperación selectiva: public.productos en tienda_tabla_rescate,
-  100 filas; CSV /var/lib/pgsql/backups/productos_rescate.csv.
-- Fecha documentada del CSV: 2026-10-21 17:47 CEST.
-- CSV: 100 IDs únicos; diferencias con tabla original=0.
-- Prueba de importación temporal: COPY 100; ROLLBACK ejecutado;
-  tabla temporal eliminada y sin cambios en la tabla original.
-- Nueva restauración en tienda_rescate_revision: 100 productos recuperados.
-- Extracción CSV y comparación temporal: COPY 100, diferencias=0;
-  ROLLBACK confirmado, sin modificar la tabla original.
+- Dump: 14288 bytes, postgres, 0600; modificación 2026-10-22 11:37:29.352392955 +0200.
+- pg_restore --list: CUSTOM/gzip, 41 entradas; servidor y pg_dump 18.6.
+- Restore en tienda_restore: clientes/productos/pedidos/pedido_items=24/100/200/200, iguales al origen.
+- pg-lab-backup.service: Result=success, ExecMainStatus=0; timer enabled/active.
+- Próximo disparo indicado al consultar: 2026-10-23 00:02:24 CEST.
+- tienda_tabla_rescate: 100 productos; CSV /var/lib/pgsql/backups/productos_rescate.csv, fechado 2026-10-21 17:47 CEST.
+- CSV: 100 IDs únicos, diferencias=0; importación temporal COPY 100 y ROLLBACK; temporal eliminada.
+- tienda_rescate_revision: 100 productos; extracción/importación CSV, COPY 100, diferencias=0 y ROLLBACK confirmado.
 
 3) INCIDENCIAS Y LIMITACIONES
-- pg_restore --list por sí solo no prueba una restauración: se validó
-  adicionalmente en tienda_restore y tienda_tabla_rescate.
-- El estado del timer es histórico, no una lectura en tiempo real.
+- Catálogo legible no equivale a restore; la restauración se comprobó en bases auxiliares.
+- Las fechas del dump, CSV y timer son referencias independientes; no prueban una misma ejecución ni disponibilidad actual.
 
 4) ESTADO FINAL Y REVERSIÓN
-- Base de datos original tienda conservada sin modificaciones por la restauración.
-- Recuperación selectiva y reversión de la inserción: verificadas.
-- No se ejecutó una restauración destructiva sobre tienda.
+- tienda sin modificaciones por las restauraciones; comparación temporal revertida.
+- No se realizó restauración destructiva sobre tienda.
 
 5) CONCLUSIÓN
-- Dump legible, restauración completa probada, copia automática correcta
-  y recuperación de una tabla verificada sin alterar la base original.
+- VALIDADO: restauración completa, recuperación selectiva y ejecución del backup programado para las comprobaciones registradas.

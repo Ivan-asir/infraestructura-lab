@@ -1,44 +1,29 @@
 VALIDACIÓN | 21 - KUBERNETES CON KIND
-==================================
+=====================================
 
 1) CONTEXTO
-- Entorno: Windows 11, Ubuntu/WSL2, Docker Desktop 4.97.0 y Docker Engine 29.9.2.
-- Clúster: infraestructura-lab-kubernetes; Kubernetes v1.37.0.
-- Contexto: kind-infraestructura-lab-kubernetes; API local 127.0.0.1:34567.
-- Aplicación: namespace web-lab, Deployment web-lab y Service web-lab.
-- Estado: K1, K2 y K3 VALIDADOS.
+- Windows 11, Ubuntu/WSL2; Docker Desktop 4.97.0, Engine 29.9.2; Kubernetes v1.37.0.
+- Clúster infraestructura-lab-kubernetes; contexto kind-infraestructura-lab-kubernetes; API 127.0.0.1:34567.
+- Namespace web-lab; Deployment/Service web-lab; nodo Debian 13 y containerd 2.3.4.
+- Ejecución adicional DNS/Service: Ubuntu/WSL2; contexto kind-infraestructura-lab-kubernetes; namespace web-lab.
 
 2) COMPROBACIONES Y RESULTADOS
-- `kind create cluster`: creación correcta; control-plane Ready después de 16 segundos.
-- `kind get clusters`: infraestructura-lab-kubernetes.
-- `docker port infraestructura-lab-kubernetes-control-plane 6443/tcp`: 127.0.0.1:34567.
-- `kubectl get nodes -o wide`: control-plane Ready; versión v1.37.0; Debian 13; containerd 2.3.4.
-- `kubectl -n web-lab get deployments,services,pods -o wide`: Deployment web-lab con 2/2 réplicas disponibles; Service ClusterIP 80/TCP.
-- Pods: dos Running, ambos 1/1 Ready y 0 reinicios en la observación.
-- `kubectl -n web-lab rollout status deployment/web-lab --timeout=30s`: successfully rolled out.
-- `kubectl -n web-lab rollout history deployment/web-lab`: revisiones 2 y 3 presentes.
-- `kubectl -n web-lab describe deployment web-lab`: revisión actual 3; 2 réplicas deseadas, 2 disponibles, ninguna no disponible.
-- Condiciones: Available=True / MinimumReplicasAvailable; Progressing=True / NewReplicaSetAvailable.
-- Imagen: nginx:stable-alpine; readiness y liveness por HTTP en puerto 80; ConfigMap web-html montado.
-- `kubectl -n web-lab get events --sort-by=.lastTimestamp`: sin eventos en el momento de consulta.
-- `kubectl -n web-lab port-forward svc/web-lab 18081:80`: conexión local aceptada.
-- `curl -i --max-time 10 http://127.0.0.1:18081/`: HTTP/1.1 200 OK; página con título "Laboratorio Kubernetes".
-- K3: fallo controlado de readiness (HTTP 404); nuevo Pod 0/1 mientras las dos réplicas anteriores permanecían disponibles.
-- rollout undo ejecutado; rollout recuperado, Deployment 2/2, readiness restaurada a / y HTTP 200 posterior por port-forward.
+- kind create/get clusters, docker port y kubectl get nodes: clúster creado, API indicada y control-plane Ready a los 16 s.
+- get/describe deployment y rollout status: 2/2 disponibles; dos Pods Running, 1/1 Ready, 0 reinicios; Service ClusterIP 80/TCP.
+- rollout history: revisiones 2 y 3; activa 3. Available=True/MinimumReplicasAvailable; Progressing=True/NewReplicaSetAvailable; sin eventos al consultar.
+- nginx:stable-alpine; probes HTTP y ConfigMap web-html montado.
+- port-forward svc/web-lab 18081:80 y curl: HTTP 200, título "Laboratorio Kubernetes".
+- K3: readiness HTTP 404, Pod nuevo 0/1 y dos réplicas sanas disponibles; rollout undo registrado; recuperación 2/2, readiness / y HTTP 200 por túnel.
 
 3) INCIDENCIAS Y LIMITACIONES
-- El primer intento de crear `kind` falló al publicar TCP/34077, reservado por Windows en el intervalo 34018–34117.
-- Configurar 127.0.0.1:34567 permitió crear el clúster sin modificar las exclusiones de Windows.
-- Las revisiones 2 y 3 y el despliegue sano acreditan el estado posterior.
-- K3: rollback ejecutado y verificado; Deployment 2/2, readiness restaurada y respuesta HTTP 200.
+- TCP/34077 reservado por Windows (34018–34117); resuelto usando 127.0.0.1:34567 sin cambiar exclusiones.
+- La transcripción concreta de rollout undo no está conservada; sí consta el resultado funcional posterior.
+- HTTP por port-forward no acredita DNS/ClusterIP desde otro Pod. Prueba interna del Service: PENDIENTE.
 
 4) ESTADO FINAL Y REVERSIÓN
-- Estado observado: control-plane Ready; dos Pods Running/Ready; servicio HTTP 200; rollout correcto; revisión 3.
-- Reversión de la incidencia inicial: cambio a puerto local 34567; no se alteraron las reservas de Windows.
-- K3: estado funcional posterior acreditado mediante Deployment disponible, revisión 3 y respuesta HTTP 200. La transcripción de la operación concreta
-  de reversión no forma parte de la evidencia conservada.
+- Estado observado: control-plane Ready, Deployment 2/2, Pods Ready, rollout correcto, revisión 3 y HTTP 200.
+- Incidencia inicial resuelta con el puerto 34567; recuperación K3 registrada con readiness /.
 
 5) CONCLUSIÓN
-- K1 (clúster): VALIDADO.
-- K2 (Deployment, Service, réplicas, probes y respuesta HTTP): VALIDADO.
-- K3 (fallo de readiness, diagnóstico y rollback): VALIDADO.
+- K1, K2 y K3: VALIDADOS para el alcance registrado.
+- Acceso interno DNS/Service: VALIDADO en la ejecución adicional identificada; no acredita distribución uniforme entre réplicas.

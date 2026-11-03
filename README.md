@@ -49,24 +49,27 @@ no representa una numeración global de todas las tecnologías.
 
 ## Estado
 
-| Apartado                                    | Estado    |
-| ------------------------------------------- | --------- |
-| Red y SSH                                   | `OK`    |
-| Preparación de Rocky Linux                 | `OK`    |
-| Instalación de PostgreSQL                  | `OK`    |
-| SQL, roles y permisos                       | `OK`    |
-| Backup y restore                            | `OK`    |
-| PITR                                        | `OK`    |
-| Rendimiento                                 | `OK` |
-| Monitorización y troubleshooting           | Pendiente |
-| Replicación                                | Pendiente |
-| Docker Compose y CI                         | `OK`    |
-| Jenkins                                     | `OK`    |
-| Ansible                                     | Pendiente |
-| Oracle Database Free                        | Pendiente |
-| Kubernetes (creación de clúster `kind`) | `OK`    |
-| Kubernetes (Deployment y Service) | `OK` |
-| Kubernetes (K3: fallo de readiness y rollback) | `OK` |
+| Apartado | Estado | Evidencia |
+|---|---|---|
+| Red y SSH | VALIDADO | [Validación](docs/evidence/network-validation.txt) |
+| Preparación de Rocky Linux | VALIDADO | [Validación](docs/evidence/rocky-baseline.txt) |
+| Instalación de PostgreSQL | VALIDADO | [Validación](postgresql/01-installation/validation.txt) |
+| SQL, roles y permisos | VALIDADO | [Validación](postgresql/02-sql-roles/validation.txt) |
+| Backup y restore | VALIDADO | [Validación](postgresql/03-backups/validation.txt) |
+| PITR funcional y retorno al PGDATA | VALIDADO | [Validación](postgresql/04-pitr/validation.txt) |
+| Rendimiento | VALIDADO | [Validación](postgresql/05-performance/validation.txt) |
+| Monitorización y troubleshooting | PENDIENTE | — |
+| Replicación | PENDIENTE | — |
+| Docker Compose y CI | VALIDADO | [Validación](docker/validation.txt) |
+| Jenkins: pipeline estático | VALIDADO | [Validación](jenkins/validation.txt) |
+| Ansible | PENDIENTE | — |
+| Oracle Database Free | PENDIENTE | — |
+| Kubernetes K1: creación del clúster kind | VALIDADO | [Validación](kubernetes/validation.txt) |
+| Kubernetes K2: objetos y HTTP por túnel | VALIDADO | [Validación](kubernetes/validation.txt) |
+| Kubernetes K3: fallo y recuperación registrados | VALIDADO | [Validación](kubernetes/validation.txt) |
+| Kubernetes: acceso interno DNS/Service | PENDIENTE | — |
+
+Los estados corresponden a las comprobaciones conservadas, no a la disponibilidad actual.
 
 ## Reproducir las prácticas
 
